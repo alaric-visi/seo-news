@@ -8,7 +8,7 @@ export default {
       fontFamily: {
         sans: ['Geist Variable', 'ui-sans-serif', 'system-ui', 'sans-serif'],
         display: ['Geist Variable', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-        mono: ['JetBrains Mono Variable', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+        mono: ['DM Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
       },
       colors: {
         background: 'hsl(var(--background))',

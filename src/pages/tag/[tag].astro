@@ -1,6 +1,7 @@
 ---
 import type { GetStaticPaths } from 'astro';
 import StoryCard from '../../components/StoryCard.astro';
+import TagChip from '../../components/TagChip.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { tagById } from '../../config/tags';
 import { formatDayLong } from '../../lib/dates';
@@ -21,6 +22,7 @@ const data = await loadNews();
 const stories = data.stories.filter((s) => s.tags.includes(tag)).slice(0, MAX_STORIES);
 const byDay = new Map<string, typeof stories>();
 for (const s of stories) byDay.set(s.day, [...(byDay.get(s.day) ?? []), s]);
+const total = data.tagCounts.get(tag) ?? 0;
 
 const title = `${rule.label} News: Latest SEO Updates | Mike Higgins`;
 const description = rule.intro.length > 160 ? `${rule.intro.slice(0, 157).replace(/\s+\S*$/, '')}…` : rule.intro;
@@ -31,23 +33,40 @@ const description = rule.intro.length > 160 ? `${rule.intro.slice(0, 157).replac
   description={description}
   jsonLd={collectionJsonLd({ name: `${rule.label} news`, description: rule.intro, url: new URL(Astro.url.pathname, Astro.site).toString(), stories })}
 >
-  <header class="mb-8 max-w-3xl">
-    <p class="text-section-label uppercase text-primary">SEO News · Topic</p>
-    <h1 class="mt-3 font-display text-3xl font-light tracking-tight sm:text-4xl">{rule.label}</h1>
-    <p class="mt-3 leading-relaxed text-muted-foreground">{rule.intro}</p>
-    <p class="mt-2 font-mono text-xs text-muted-foreground">{data.tagCounts.get(tag)} stories{stories.length < (data.tagCounts.get(tag) ?? 0) && `, latest ${stories.length} shown`}</p>
-  </header>
+  <div class="workspace">
+    <section class="panel" aria-labelledby="tag-heading">
+      <div class="panel-header">
+        <div class="panel-title-wrap">
+          <p class="panel-title">Topic</p>
+          <span class="panel-meta">{total} stories{stories.length < total && `, latest ${stories.length} shown`}</span>
+        </div>
+      </div>
+      <div class="panel-body">
+        <h1 id="tag-heading" class="text-2xl font-semibold tracking-[-0.02em] text-white sm:text-[28px]">{rule.label}</h1>
+        <p class="mt-2 max-w-3xl text-[13.5px] leading-relaxed text-muted-foreground">{rule.intro}</p>
 
-  <div class="max-w-3xl space-y-10">
-    {[...byDay.entries()].map(([day, list]) => (
-      <section aria-labelledby={`d-${day}`}>
-        <h2 id={`d-${day}`} class="mb-3 font-display text-sm font-medium text-muted-foreground">
-          <a href={dayHref(day)} class="hover:text-foreground">{formatDayLong(day)}</a>
-        </h2>
-        <ul class="space-y-3">
-          {list.map((s) => <li class="list-none"><StoryCard story={s} /></li>)}
-        </ul>
-      </section>
-    ))}
+        <div class="mt-6 space-y-7">
+          {[...byDay.entries()].map(([day, list]) => (
+            <section aria-labelledby={`d-${day}`}>
+              <h2 id={`d-${day}`} class="section-label mb-2.5">
+                <a href={dayHref(day)} class="hover:text-foreground">{formatDayLong(day)}</a>
+              </h2>
+              <ul class="space-y-3">
+                {list.map((s) => <li class="list-none"><StoryCard story={s} /></li>)}
+              </ul>
+            </section>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <aside class="panel" aria-labelledby="other-topics-heading">
+      <div class="panel-header">
+        <h2 id="other-topics-heading" class="panel-title">Other topics</h2>
+      </div>
+      <div class="flex flex-wrap gap-1.5 p-4">
+        {activeTags(data).filter((t) => t.id !== tag).map((t) => <TagChip tag={t.id} count={data.tagCounts.get(t.id)} />)}
+      </div>
+    </aside>
   </div>
 </BaseLayout>

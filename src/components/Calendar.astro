@@ -8,13 +8,14 @@ interface Props {
   counts: Map<string, number>;
   selected?: string | null;
   today: string;
-  /** Heading level for the month name. */
-  headingLevel?: 'h2' | 'h3';
   id?: string;
+  /** 'card' for the archive grid; 'bare' inside a sidebar panel. */
+  variant?: 'card' | 'bare';
 }
 
-const { month, counts, selected, today, headingLevel = 'h2', id } = Astro.props;
-const Heading = headingLevel;
+const { month, counts, selected, today, id, variant = 'card' } = Astro.props;
+// Inside the sidebar the panel header is already an h2.
+const Heading = variant === 'bare' ? 'h3' : 'h2';
 const [y, m] = month.split('-').map(Number);
 const daysInMonth = new Date(Date.UTC(y, m, 0)).getUTCDate();
 // Monday-first grid.
@@ -28,29 +29,29 @@ const level = (c: number) => (c === 0 ? 0 : c / max > 0.66 ? 3 : c / max > 0.33 
 const total = cells.reduce((sum, d) => sum + (d ? counts.get(d) ?? 0 : 0), 0);
 ---
 
-<section class="rounded-lg border bg-card p-4" id={id} aria-label={`${formatMonth(month)}: ${total} stories`}>
+<section class:list={[variant === 'card' && 'card']} id={id} aria-label={`${formatMonth(month)}: ${total} stories`}>
   <div class="mb-3 flex items-baseline justify-between">
-    <Heading class="font-display text-sm font-medium">{formatMonth(month)}</Heading>
-    <span class="font-mono text-[11px] text-muted-foreground">{total} {total === 1 ? 'story' : 'stories'}</span>
+    <Heading class="text-[13px] font-semibold">{formatMonth(month)}</Heading>
+    <span class="mono text-[11px] text-muted-foreground">{total} {total === 1 ? 'story' : 'stories'}</span>
   </div>
-  <div class="grid grid-cols-7 gap-1 text-center font-mono text-[11px]" role="presentation">
-    {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d) => <span class="pb-1 text-muted-foreground" aria-hidden="true">{d}</span>)}
+  <div class="mono grid grid-cols-7 gap-1 text-center text-[11px]" role="presentation">
+    {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d) => <span class="pb-1 text-[var(--text-dim)]" aria-hidden="true">{d}</span>)}
     {cells.map((d) => {
       if (!d) return <span aria-hidden="true"></span>;
       const c = counts.get(d) ?? 0;
       const lv = level(c);
       const label = `${formatDayLong(d)}: ${c} ${c === 1 ? 'story' : 'stories'}`;
       const cls = [
-        'flex aspect-square items-center justify-center rounded-sm',
-        lv === 0 && 'text-muted-foreground/50',
-        lv === 1 && 'bg-primary/20 text-foreground',
-        lv === 2 && 'bg-primary/45 text-foreground',
-        lv === 3 && 'bg-primary/80 text-primary-foreground',
-        d === selected && 'ring-2 ring-accent',
-        d === today && d !== selected && 'ring-1 ring-foreground/40',
+        'flex aspect-square items-center justify-center rounded-[5px] border',
+        lv === 0 && 'border-transparent text-[var(--text-dim)]/60',
+        lv === 1 && 'border-[var(--accent-border)] bg-primary/10 text-foreground',
+        lv === 2 && 'border-[var(--accent-border)] bg-primary/30 text-foreground',
+        lv === 3 && 'border-transparent bg-primary font-medium text-primary-foreground',
+        d === selected && 'outline outline-2 outline-offset-1 outline-white',
+        d === today && d !== selected && 'outline outline-1 outline-offset-1 outline-white/40',
       ];
       return c > 0 ? (
-        <a href={dayHref(d)} class:list={[...cls, 'transition-opacity hover:opacity-80']} aria-label={label} aria-current={d === selected ? 'date' : undefined} title={label}>{Number(d.slice(8))}</a>
+        <a href={dayHref(d)} class:list={[...cls, 'transition-[filter] hover:brightness-125']} aria-label={label} aria-current={d === selected ? 'date' : undefined} title={label}>{Number(d.slice(8))}</a>
       ) : (
         <span class:list={cls} title={label}>{Number(d.slice(8))}</span>
       );

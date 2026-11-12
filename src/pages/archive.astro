@@ -24,13 +24,21 @@ if (data.days.length) {
 <BaseLayout
   title="SEO News Archive: Every Day in SEO by Month | Mike Higgins"
   description="Browse the SEO News archive by day. Each date links to that day's Google announcements, algorithm update rollouts and search industry coverage."
+  section="archive"
 >
-  <header class="mb-8">
-    <p class="text-section-label uppercase text-primary">SEO News</p>
-    <h1 class="mt-3 font-display text-3xl font-light tracking-tight sm:text-4xl">Archive</h1>
-    <p class="mt-2 text-muted-foreground">{data.stories.length} stories across {data.days.length} days. Darker days had more news.</p>
-  </header>
-  <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-    {months.map((m) => <Calendar month={m} counts={counts} today={data.today} id={`m-${m}`} />)}
-  </div>
+  <section class="panel flex-1" aria-labelledby="archive-heading">
+    <div class="panel-header">
+      <div class="panel-title-wrap">
+        <p class="panel-title">Archive</p>
+        <span class="panel-meta">{data.stories.length} stories · {data.days.length} days</span>
+      </div>
+    </div>
+    <div class="panel-body">
+      <h1 id="archive-heading" class="text-2xl font-semibold tracking-[-0.02em] text-white sm:text-[28px]">SEO News archive</h1>
+      <p class="mt-1 text-[13px] text-muted-foreground">Pick a day to see its stories. Brighter days had more news.</p>
+      <div class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {months.map((m) => <Calendar month={m} counts={counts} today={data.today} id={`m-${m}`} />)}
+      </div>
+    </div>
+  </section>
 </BaseLayout>

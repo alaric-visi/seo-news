@@ -10,7 +10,7 @@ import TagChip from './TagChip.astro';
 interface Props {
   data: NewsData;
   day: string;
-  /** The home page shows "Today" / "Latest" wording and an h1 for the app. */
+  /** Home page wording: "Today" / "Yesterday" / "Latest edition". */
   isHome?: boolean;
   /** Home page only: today's first few stories, when the main edition is yesterday's. */
   soFarToday?: StoryView[];
@@ -28,82 +28,88 @@ const counts = new Map(data.days.map((d) => [d, data.byDay.get(d)!.length]));
 const official = stories.filter((s) => s.sourceCategory === 'official').length;
 const sources = new Set(stories.map((s) => s.sourceId)).size;
 const isToday = day === data.today;
+const isYesterday = day === data.days.find((d) => d < data.today);
+const label = isToday ? 'Today' : isHome && isYesterday ? 'Yesterday' : isHome ? 'Latest edition' : 'Edition';
 ---
 
-<div class="grid gap-10 lg:grid-cols-[minmax(0,1fr)_300px]">
-  <div class="min-w-0">
-    <header class="mb-8">
-      {isHome ? (
-        <>
-          <p class="text-section-label uppercase text-primary">Every day in SEO, on one calendar</p>
-          <h1 class="mt-3 font-display text-3xl font-light tracking-tight sm:text-5xl">SEO News</h1>
-          <p class="mt-3 text-muted-foreground">
-            {isToday ? 'Today' : day === data.days.find((d) => d < data.today) ? 'Yesterday' : 'Latest edition'}: <time datetime={day} class="text-foreground">{formatDayLong(day)}</time>
-          </p>
-        </>
-      ) : (
-        <>
-          <p class="text-section-label uppercase text-primary">SEO News{isToday && ' · Today'}</p>
-          <h1 class="mt-3 font-display text-3xl font-light tracking-tight sm:text-4xl"><time datetime={day}>{formatDayLong(day)}</time></h1>
-        </>
-      )}
-      <p class="mt-2 font-mono text-xs text-muted-foreground">
-        {stories.length} {stories.length === 1 ? 'story' : 'stories'} from {sources} {sources === 1 ? 'source' : 'sources'}{official > 0 && ` · ${official} from Google`}
+<div class="workspace">
+  <section class="panel" aria-labelledby="day-heading">
+    <div class="panel-header">
+      <div class="panel-title-wrap">
+        <p class="panel-title">{label}</p>
+        <span class="panel-meta">{stories.length} {stories.length === 1 ? 'story' : 'stories'} · {sources} {sources === 1 ? 'source' : 'sources'}</span>
+        {official > 0 && <span class="panel-meta">{official} from Google</span>}
+      </div>
+      <nav aria-label="Other days" class="flex items-center gap-1.5">
+        {older && <a href={dayHref(older)} rel="prev" class="btn btn-xs">← {formatDayShort(older)}</a>}
+        <a href={archiveHref(day.slice(0, 7))} class="btn btn-xs">Archive</a>
+        {newer && <a href={dayHref(newer)} rel="next" class="btn btn-xs">{formatDayShort(newer)} →</a>}
+      </nav>
+    </div>
+
+    <div class="panel-body">
+      <h1 id="day-heading" class="text-2xl font-semibold tracking-[-0.02em] text-white sm:text-[28px]">
+        {isHome ? <>SEO News <span class="text-muted-foreground font-normal">· {formatDayLong(day)}</span></> : <time datetime={day}>{formatDayLong(day)}</time>}
+      </h1>
+      <p class="mt-1 text-[13px] text-muted-foreground">
+        {isHome
+          ? "Google's announcements, algorithm updates and the industry's coverage, grouped by story."
+          : `SEO and Google Search news from ${formatDayLong(day)}, grouped by story.`}
       </p>
-    </header>
 
-    {soFarToday.length > 0 && (
-      <section aria-labelledby="so-far-today" class="mb-8 rounded-lg border border-dashed p-4">
-        <div class="mb-2 flex items-baseline justify-between gap-4">
-          <h2 id="so-far-today" class="font-display text-sm font-medium">So far today</h2>
-          <a href={dayHref(data.today)} class="text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline">{formatDayShort(data.today)} →</a>
-        </div>
-        <ul class="space-y-1.5">
-          {soFarToday.map((s) => (
-            <li class="text-sm leading-snug">
-              <span class="font-mono text-xs text-muted-foreground">{formatTime(s.publishedAt)}</span>{' '}
-              <span class:list={['font-medium', s.sourceCategory === 'official' ? 'text-primary' : 'text-foreground/80']}>{s.sourceName}:</span>{' '}
-              <a href={s.url} rel="noopener" target="_blank" class="text-muted-foreground underline-offset-4 hover:text-foreground hover:underline">{s.title}</a>
-            </li>
-          ))}
-        </ul>
-      </section>
-    )}
+      {soFarToday.length > 0 && (
+        <section aria-labelledby="so-far-today" class="card mt-5 border-dashed">
+          <div class="mb-2 flex items-baseline justify-between gap-4">
+            <h2 id="so-far-today" class="section-label">So far today</h2>
+            <a href={dayHref(data.today)} class="mono text-[11px] text-accent hover:underline">{formatDayShort(data.today)} →</a>
+          </div>
+          <ul class="space-y-1">
+            {soFarToday.map((s) => (
+              <li class="text-[13px] leading-snug">
+                <span class="mono text-[11px] text-[var(--text-dim)]">{formatTime(s.publishedAt)}</span>{' '}
+                <span class:list={['font-medium', s.sourceCategory === 'official' ? 'text-accent' : 'text-foreground/85']}>{s.sourceName}:</span>{' '}
+                <a href={s.url} rel="noopener" target="_blank" class="text-muted-foreground underline-offset-4 hover:text-foreground hover:underline">{s.title}</a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
-    {digest && (
-      <section aria-label="The day in brief" class="mb-8 rounded-lg border bg-card p-5">
-        <div class="mb-2 flex items-center gap-2">
-          <h2 class="font-display text-sm font-medium">The day in brief</h2>
-          <span class="rounded-sm border px-1 py-px font-mono text-[10px] uppercase tracking-wider text-muted-foreground" title="Written by AI from the day's headlines and feed descriptions">AI</span>
-        </div>
-        <div class="space-y-3 leading-relaxed text-foreground/90">
-          {introParagraphs.map((p) => <p>{p}</p>)}
-        </div>
-      </section>
-    )}
+      {digest && (
+        <section aria-labelledby="day-brief" class="info-card mt-5">
+          <div class="mb-2 flex items-center gap-2">
+            <h2 id="day-brief" class="info-card-title">The day in brief</h2>
+            <span class="badge-ai" title="Written by AI from the day's headlines and feed descriptions">AI</span>
+          </div>
+          <div class="space-y-2.5 text-[13.5px] leading-relaxed text-[#d4d4d8]">
+            {introParagraphs.map((p) => <p>{p}</p>)}
+          </div>
+        </section>
+      )}
 
-    <h2 class="sr-only">Stories</h2>
-    <ol class="space-y-5">
-      {groups.map((g) => <StoryGroup group={g} />)}
-    </ol>
+      <h2 class="section-label mb-3 mt-6">Stories</h2>
+      <ol class="space-y-3">
+        {groups.map((g) => <StoryGroup group={g} />)}
+      </ol>
+    </div>
+  </section>
 
-    <nav aria-label="Other days" class="mt-10 flex items-center justify-between gap-4 border-t pt-6 text-sm">
-      <span class="min-w-20">
-        {older && <a href={dayHref(older)} rel="prev" class="text-muted-foreground hover:text-foreground">← {formatDayShort(older)}</a>}
-      </span>
-      <a href={archiveHref(day.slice(0, 7))} class="text-muted-foreground hover:text-foreground">Archive</a>
-      <span class="min-w-20 text-right">
-        {newer && <a href={dayHref(newer)} rel="next" class="text-muted-foreground hover:text-foreground">{formatDayShort(newer)} →</a>}
-      </span>
-    </nav>
-  </div>
-
-  <aside class="space-y-6" aria-label="More">
+  <aside class="panel" aria-label="Google updates, calendar and topics">
     <GoogleUpdatesPanel data={data} />
-    <Calendar month={day.slice(0, 7)} counts={counts} selected={day} today={data.today} />
-    <section class="rounded-lg border bg-card p-4" aria-labelledby="topics-heading">
-      <h2 id="topics-heading" class="mb-3 font-display text-sm font-medium">Topics</h2>
-      <div class="flex flex-wrap gap-1.5">
+    <section class="side-section" aria-labelledby="calendar-heading">
+      <div class="panel-header">
+        <h2 id="calendar-heading" class="panel-title">Calendar</h2>
+        <a href={archiveHref()} class="btn btn-xs">All months</a>
+      </div>
+      <div class="p-4">
+        <Calendar month={day.slice(0, 7)} counts={counts} selected={day} today={data.today} variant="bare" />
+      </div>
+    </section>
+    <section class="side-section" aria-labelledby="topics-heading">
+      <div class="panel-header">
+        <h2 id="topics-heading" class="panel-title">Topics</h2>
+      </div>
+      <div class="flex flex-wrap gap-1.5 p-4">
         {activeTags(data).map((t) => <TagChip tag={t.id} count={data.tagCounts.get(t.id)} />)}
       </div>
     </section>

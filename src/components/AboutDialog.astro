@@ -1,0 +1,75 @@
+---
+/** About dialog, in the same style as the portfolio tools' About panels. */
+import { CATEGORY_LABELS, SOURCES } from '../config/sources';
+import { TAG_RULES } from '../config/tags';
+
+const sources = SOURCES.filter((s) => s.enabled);
+const faqs = [
+  {
+    q: 'How often is it updated?',
+    a: 'Once a day at about 05:15 UTC (05:15 in winter, 06:15 in summer, UK time). Each run reads every feed, saves new stories and rebuilds the site. Days follow UK (London) time.',
+  },
+  {
+    q: 'Do you republish articles?',
+    a: "No. Each story is a headline, its source, the time and a link to the original article. We keep a short part of each feed's description to tag stories and write summaries, but never show it.",
+  },
+  {
+    q: 'Who writes the summaries?',
+    a: "The one-line summaries and the day in brief are written by AI (DeepSeek) from the headlines and feed descriptions only, and are labelled as AI. They can miss nuance, so read the original before relying on them.",
+  },
+  {
+    q: 'How are stories grouped?',
+    a: 'Stories about the same named Google update (for example "November 2026 core update") are grouped under Google\'s own announcement, as are near-identical headlines from different outlets published within 48 hours.',
+  },
+  {
+    q: 'Where do Google updates come from?',
+    a: "The Google updates panel reads the Google Search Status Dashboard. Ranking updates show how many days they have been rolling out against Google's stated window.",
+  },
+];
+---
+
+<dialog id="about-dialog" class="about-dialog" aria-labelledby="about-title">
+  <div class="about-inner">
+    <header class="about-head">
+      <h2 id="about-title">
+        <svg class="icon text-teal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="3" y="4" width="18" height="17" rx="2" /><path d="M3 9h18M8 2v4M16 2v4" /><path d="M7 13h4M7 17h7" />
+        </svg>
+        About SEO News
+      </h2>
+      <button type="button" class="about-close" id="btn-close-about" aria-label="Close">&times;</button>
+    </header>
+
+    <p>
+      <strong>SEO News</strong> puts every day in SEO on one calendar: Google's own announcements, algorithm update
+      rollouts from the Search Status Dashboard, and coverage from the search trade press, tool vendors and Hacker News.
+      Official Google posts are marked so you can tell them apart from coverage.
+    </p>
+
+    <h3>Sources</h3>
+    <div class="about-table">
+      <table>
+        <thead><tr><th>Source</th><th>Type</th></tr></thead>
+        <tbody>
+          {sources.map((s) => (
+            <tr>
+              <td><a href={s.homepage} rel="noopener" target="_blank" class="text-foreground hover:text-accent">{s.name}</a></td>
+              <td class="text-muted-foreground">{CATEGORY_LABELS[s.category]}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Topics</h3>
+    <p class="text-muted-foreground">{TAG_RULES.map((t) => t.label).join(', ')}. Stories are tagged by keyword rules on their headline and description.</p>
+
+    <h3>Questions</h3>
+    {faqs.map((f) => (
+      <details>
+        <summary>{f.q}</summary>
+        <p>{f.a}</p>
+      </details>
+    ))}
+  </div>
+</dialog>

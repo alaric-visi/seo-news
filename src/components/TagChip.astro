@@ -8,11 +8,8 @@ const rule = tagById(tag);
 ---
 
 {rule && (
-  <a
-    href={tagHref(tag)}
-    class="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] leading-5 text-muted-foreground transition-colors hover:border-primary/60 hover:text-foreground"
-  >
+  <a href={tagHref(tag)} class="chip">
     {rule.label}
-    {count !== undefined && <span class="font-mono text-[10px] opacity-70">{count}</span>}
+    {count !== undefined && <span class="chip-count">{count}</span>}
   </a>
 )}

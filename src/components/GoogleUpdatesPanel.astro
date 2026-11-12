@@ -20,36 +20,36 @@ const open = data.incidents.filter((i) => !i.endAt);
 const recent = data.incidents.filter((i) => i.endAt).slice(0, 6);
 ---
 
-<section aria-labelledby="google-updates-heading" class="rounded-lg border bg-card">
-  <div class="flex items-center justify-between border-b px-4 py-3">
-    <h2 id="google-updates-heading" class="font-display text-sm font-medium">Google updates</h2>
-    <a href="https://status.search.google.com/" rel="noopener" target="_blank" class="text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline">Status Dashboard</a>
+<section aria-labelledby="google-updates-heading" class="side-section">
+  <div class="panel-header">
+    <div class="panel-title-wrap">
+      <h2 id="google-updates-heading" class="panel-title">Google updates</h2>
+      {open.length > 0 && <span class="panel-meta">{open.length} active</span>}
+    </div>
+    <a href="https://status.search.google.com/" rel="noopener" target="_blank" class="btn btn-xs" title="Google Search Status Dashboard">Dashboard</a>
   </div>
 
   {data.incidents.length === 0 ? (
-    <p class="px-4 py-4 text-sm text-muted-foreground">No incidents recorded yet.</p>
+    <p class="px-4 py-4 text-muted-foreground">No incidents recorded yet.</p>
   ) : (
-    <div class="divide-y">
+    <div class="space-y-3 p-4">
       {open.map((i) => {
         const day = daysBetween(londonDay(i.beginAt), data.today) + 1;
         const window = rolloutWindowDays(i.updates);
         const isRanking = i.serviceName === 'Ranking';
         return (
-          <a href={i.uri} rel="noopener" target="_blank" class="block px-4 py-3 transition-colors hover:bg-secondary">
-            <div class="flex items-center gap-2">
-              <span class="relative flex h-2 w-2" aria-hidden="true">
-                <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-60 motion-reduce:animate-none"></span>
-                <span class="relative inline-flex h-2 w-2 rounded-full bg-accent"></span>
-              </span>
-              <span class="text-[10px] font-medium uppercase tracking-wider text-accent">{isRanking ? 'Rolling out' : 'Ongoing'}</span>
-            </div>
-            <p class="mt-1 text-sm font-medium text-foreground">{i.title}</p>
-            <p class="mt-0.5 text-xs text-muted-foreground">
+          <a href={i.uri} rel="noopener" target="_blank" class="info-card block transition-colors hover:border-[var(--accent-hex)]">
+            <span class="status-badge info-card-title">
+              <span class="status-badge-dot animate-pulse motion-reduce:animate-none" aria-hidden="true"></span>
+              {isRanking ? 'Rolling out' : 'Ongoing'}
+            </span>
+            <p class="mt-1.5 text-sm font-semibold text-foreground">{i.title}</p>
+            <p class="mono mt-0.5 text-[11px] text-muted-foreground">
               Started {formatDayShort(londonDay(i.beginAt))} · day {day}{window ? ` of up to ${window}` : ''}
             </p>
             {window && (
-              <div class="mt-2 h-1 overflow-hidden rounded-full bg-muted" role="presentation">
-                <div class="h-full rounded-full bg-accent" style={`width:${Math.min(100, Math.round((day / window) * 100))}%`}></div>
+              <div class="mt-2 h-1 overflow-hidden rounded-full bg-white/10" role="presentation">
+                <div class="h-full rounded-full bg-primary shadow-[0_0_8px_var(--accent-glow)]" style={`width:${Math.min(100, Math.round((day / window) * 100))}%`}></div>
               </div>
             )}
           </a>
@@ -57,9 +57,9 @@ const recent = data.incidents.filter((i) => i.endAt).slice(0, 6);
       })}
 
       {recent.length > 0 && (
-        <div class="px-4 py-3">
-          <p class="text-section-label uppercase text-muted-foreground">Recently completed</p>
-          <ul class="mt-2 space-y-2">
+        <div>
+          <p class="section-label mb-2">Recently completed</p>
+          <ul class="space-y-2">
             {recent.map((i) => {
               const start = londonDay(i.beginAt);
               const end = londonDay(i.endAt!);
@@ -67,8 +67,8 @@ const recent = data.incidents.filter((i) => i.endAt).slice(0, 6);
               return (
                 <li>
                   <a href={i.uri} rel="noopener" target="_blank" class="group block">
-                    <span class="text-sm text-foreground/90 group-hover:text-foreground">{i.title}</span>
-                    <span class="block font-mono text-[11px] text-muted-foreground">
+                    <span class="text-[13px] text-foreground/90 group-hover:text-foreground">{i.title}</span>
+                    <span class="mono block text-[11px] text-[var(--text-dim)]">
                       {i.serviceName && i.serviceName !== 'Ranking' && `${i.serviceName} · `}{formatDayShort(start)}{start !== end && ` – ${formatDayShort(end)}`} · {length} {length === 1 ? 'day' : 'days'}
                     </span>
                   </a>
