@@ -1,6 +1,6 @@
 # SEO News
 
-Every day in SEO, on one calendar. A daily aggregator of Google's own announcements,
+Every day in SEO, on one calendar. A daily aggregator of Google's and Bing's own announcements,
 Search Status Dashboard rollouts and search-industry coverage, live at
 **https://seo-news.mikehiggins.me.uk/**.
 

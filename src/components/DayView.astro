@@ -38,7 +38,7 @@ const label = isToday ? 'Today' : isHome && isYesterday ? 'Yesterday' : isHome ?
       <div class="panel-title-wrap">
         <p class="panel-title">{label}</p>
         <span class="panel-meta">{stories.length} {stories.length === 1 ? 'story' : 'stories'} · {sources} {sources === 1 ? 'source' : 'sources'}</span>
-        {official > 0 && <span class="panel-meta">{official} from Google</span>}
+        {official > 0 && <span class="panel-meta">{official} official</span>}
       </div>
       <nav aria-label="Other days" class="flex items-center gap-1.5">
         {older && <a href={dayHref(older)} rel="prev" class="btn btn-xs">← {formatDayShort(older)}</a>}

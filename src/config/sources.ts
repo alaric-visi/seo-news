@@ -67,6 +67,39 @@ export const SOURCES: SourceConfig[] = [
     tags: ['google', 'documentation'],
     notes: 'Items link to a monthly anchor (…/updates#july-2026), so the guid identifies each change.',
   },
+  {
+    id: 'google-keyword-search',
+    name: 'Google The Keyword: Search',
+    url: 'https://blog.google/products/search/rss/',
+    homepage: 'https://blog.google/products/search/',
+    category: 'official',
+    format: 'feed',
+    enabled: true,
+    tags: ['google'],
+    notes: "Google's product blog for Search: feature launches such as AI Mode.",
+  },
+
+  // --- Bing (official) ---
+  {
+    id: 'bing-search-blog',
+    name: 'Bing Search Blog',
+    url: 'https://blogs.bing.com/search/feed',
+    homepage: 'https://blogs.bing.com/search/',
+    category: 'official',
+    format: 'feed',
+    enabled: true,
+    tags: ['bing'],
+  },
+  {
+    id: 'bing-webmaster-blog',
+    name: 'Bing Webmaster Blog',
+    url: 'https://blogs.bing.com/webmaster/feed',
+    homepage: 'https://blogs.bing.com/webmaster/',
+    category: 'official',
+    format: 'feed',
+    enabled: true,
+    tags: ['bing'],
+  },
 
   // --- Trade press ---
   {
@@ -99,6 +132,15 @@ export const SOURCES: SourceConfig[] = [
     enabled: true,
     notes: 'Despite the .rdf name this serves RSS 2.0.',
   },
+  {
+    id: 'search-engine-watch',
+    name: 'Search Engine Watch',
+    url: 'https://www.searchenginewatch.com/feed/',
+    homepage: 'https://www.searchenginewatch.com/',
+    category: 'press',
+    format: 'feed',
+    enabled: true,
+  },
 
   // --- Tool vendors ---
   {
@@ -128,8 +170,65 @@ export const SOURCES: SourceConfig[] = [
     format: 'feed',
     enabled: true,
   },
+  {
+    id: 'sistrix',
+    name: 'Sistrix',
+    url: 'https://www.sistrix.com/feed/',
+    homepage: 'https://www.sistrix.com/blog/',
+    category: 'vendor',
+    format: 'feed',
+    enabled: true,
+  },
+  {
+    id: 'screaming-frog',
+    name: 'Screaming Frog',
+    url: 'https://www.screamingfrog.co.uk/feed/',
+    homepage: 'https://www.screamingfrog.co.uk/blog/',
+    category: 'vendor',
+    format: 'feed',
+    enabled: true,
+    notes: 'Mostly SEO Spider release notes.',
+  },
+  {
+    id: 'yoast',
+    name: 'Yoast',
+    url: 'https://yoast.com/feed/',
+    homepage: 'https://yoast.com/seo-blog/',
+    category: 'vendor',
+    format: 'feed',
+    enabled: true,
+    notes: 'Includes some general marketing posts.',
+  },
 
-  // --- Community ---
+  // --- Experts & community ---
+  // Expert blogs use the 'community' category, which the database already allows.
+  {
+    id: 'gsqi',
+    name: 'GSQi (Glenn Gabe)',
+    url: 'https://www.gsqi.com/marketing-blog/feed/',
+    homepage: 'https://www.gsqi.com/marketing-blog/',
+    category: 'community',
+    format: 'feed',
+    enabled: true,
+  },
+  {
+    id: 'marie-haynes',
+    name: 'Marie Haynes',
+    url: 'https://www.mariehaynes.com/feed/',
+    homepage: 'https://www.mariehaynes.com/blog/',
+    category: 'community',
+    format: 'feed',
+    enabled: true,
+  },
+  {
+    id: 'growth-memo',
+    name: 'Growth Memo (Kevin Indig)',
+    url: 'https://www.growth-memo.com/feed',
+    homepage: 'https://www.growth-memo.com/',
+    category: 'community',
+    format: 'feed',
+    enabled: true,
+  },
   {
     id: 'hacker-news',
     name: 'Hacker News',
@@ -144,10 +243,10 @@ export const SOURCES: SourceConfig[] = [
 ];
 
 export const CATEGORY_LABELS: Record<SourceCategory, string> = {
-  official: 'Google official',
+  official: 'Official',
   press: 'Press',
   vendor: 'Tool vendor',
-  community: 'Community',
+  community: 'Experts & community',
 };
 
 export const sourceById = (id: string) => SOURCES.find((s) => s.id === id);
