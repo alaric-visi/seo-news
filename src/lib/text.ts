@@ -45,6 +45,7 @@ export function cleanExcerpt(input: string): string {
   return input
     .replace(/\bThe post .{1,200}? appeared first on .{1,100}?\.?$/i, '')
     .replace(/\s*\[(…|&#8230;|\.\.\.)\]\s*$/, '…')
-    .replace(/\bContinue reading\b.*$/i, '')
+    .replace(/\b(Continue reading|Read more)\b.*$/i, '')
+    .replace(/\s*…\s*$/, '…')
     .trim();
 }

@@ -5,7 +5,7 @@ import { addDays, londonDay, parseFeedDate } from '../src/lib/dates';
 import { toStories } from '../src/lib/ingest';
 import { FeedParseError, parseFeed, parseGoogleStatus } from '../src/lib/parse';
 import { tagsFor } from '../src/lib/tagging';
-import { decodeEntities, plainText, truncate } from '../src/lib/text';
+import { cleanExcerpt, decodeEntities, plainText, truncate } from '../src/lib/text';
 import type { Story } from '../src/lib/types';
 import { canonicalUrl } from '../src/lib/url';
 import { ATOM, RDF, RSS_FEEDBURNER, RSS_SHARED_LINKS, STATUS_JSON } from './fixtures';
@@ -106,6 +106,10 @@ describe('text and URLs', () => {
   it('decodes double-encoded entities and strips tags', () => {
     expect(decodeEntities('It&amp;#8217;s')).toBe('It’s');
     expect(plainText('&lt;p&gt;Hi &amp;amp; bye&lt;/p&gt;')).toBe('Hi & bye');
+  });
+  it('strips "Read more" and "The post … appeared first" boilerplate', () => {
+    expect(cleanExcerpt('Carmakers make up 15 of … Read more ›')).toBe('Carmakers make up 15 of…');
+    expect(cleanExcerpt('Some text. The post X appeared first on Y.')).toBe('Some text.');
   });
   it('truncates on a word boundary', () => {
     expect(truncate('one two three four five', 14)).toBe('one two three…');
