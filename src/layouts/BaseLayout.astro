@@ -1,0 +1,102 @@
+---
+import '@fontsource-variable/inter';
+import '@fontsource-variable/geist';
+import '@fontsource-variable/jetbrains-mono';
+import '../styles/global.css';
+import { archiveHref, href, rssHref } from '../lib/paths';
+
+interface Props {
+  title: string;
+  description: string;
+  jsonLd?: Record<string, unknown>;
+}
+
+const { title, description, jsonLd } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site).toString();
+// Every page stays noindex until the app is live at mikehiggins.me.uk/tools/seo-news.
+// Astro turns "true" in env vars into a boolean, so compare as strings.
+const indexable = String(import.meta.env.SEO_NEWS_INDEXABLE) === 'true';
+const gaId = import.meta.env.PUBLIC_GA_ID;
+const path = Astro.url.pathname;
+const nav = [
+  { label: 'Today', url: href(), active: path === href() },
+  { label: 'Archive', url: archiveHref(), active: path.startsWith(archiveHref()) },
+];
+---
+
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    {gaId && (
+      <>
+        <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}></script>
+        <script is:inline define:vars={{ gaId }}>
+          window.dataLayer = window.dataLayer || [];
+          function gtag() { dataLayer.push(arguments); }
+          gtag('js', new Date());
+          gtag('config', gaId);
+        </script>
+      </>
+    )}
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" href={href('favicon.png')} />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {!indexable && <meta name="robots" content="noindex, follow" />}
+    <link rel="alternate" type="application/rss+xml" title="SEO News, Mike Higgins" href={rssHref()} />
+
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Mike Higgins" />
+    <meta property="og:locale" content="en_GB" />
+    <meta property="og:image" content={new URL('/og-image.jpg', Astro.site)} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@mikejhiggins" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+
+    {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+  </head>
+  <body class="min-h-screen flex flex-col">
+    <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-primary focus:px-3 focus:py-2 focus:text-primary-foreground">Skip to content</a>
+    <header class="border-b">
+      <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-6 gap-y-3 px-4 py-4 sm:px-6">
+        <div class="flex items-center gap-3 text-sm">
+          <a href="https://mikehiggins.me.uk/" class="font-display font-medium text-foreground hover:text-primary">Mike Higgins</a>
+          <span class="text-muted-foreground" aria-hidden="true">/</span>
+          <a href="https://mikehiggins.me.uk/tools/" class="text-muted-foreground hover:text-foreground">Tools</a>
+          <span class="text-muted-foreground" aria-hidden="true">/</span>
+          <a href={href()} class="font-display font-medium text-foreground hover:text-primary">SEO News</a>
+        </div>
+        <nav aria-label="SEO News" class="flex items-center gap-1 text-sm">
+          {nav.map((n) => (
+            <a
+              href={n.url}
+              aria-current={n.active ? 'page' : undefined}
+              class:list={['rounded-md px-3 py-1.5 transition-colors', n.active ? 'bg-secondary text-foreground' : 'text-muted-foreground hover:text-foreground']}
+            >{n.label}</a>
+          ))}
+          <a href={rssHref()} class="rounded-md px-3 py-1.5 text-muted-foreground transition-colors hover:text-foreground">RSS</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main" class="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6 sm:py-12">
+      <slot />
+    </main>
+
+    <footer class="border-t">
+      <div class="mx-auto max-w-6xl px-4 py-6 text-xs leading-relaxed text-muted-foreground sm:px-6">
+        <p>
+          Headlines and links are from each publisher's public feed; every story links to the original.
+          Short summaries and day intros are written by AI from headlines and feed descriptions only, so check the source before relying on them.
+          Times are UK (London).
+        </p>
+      </div>
+    </footer>
+  </body>
+</html>

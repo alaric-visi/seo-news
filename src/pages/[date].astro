@@ -1,0 +1,27 @@
+---
+import type { GetStaticPaths } from 'astro';
+import DayView from '../components/DayView.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { formatDayLong } from '../lib/dates';
+import { loadNews } from '../lib/query';
+import { collectionJsonLd, dayDescription } from '../lib/seo';
+
+export const getStaticPaths = (async () => {
+  const data = await loadNews();
+  return data.days.map((date) => ({ params: { date } }));
+}) satisfies GetStaticPaths;
+
+const { date } = Astro.params;
+const data = await loadNews();
+const stories = data.byDay.get(date)!;
+const title = `SEO News for ${formatDayLong(date)} | Mike Higgins`;
+const description = dayDescription(date, stories);
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  jsonLd={collectionJsonLd({ name: `SEO News, ${formatDayLong(date)}`, description, url: new URL(Astro.url.pathname, Astro.site).toString(), stories })}
+>
+  <DayView data={data} day={date} />
+</BaseLayout>

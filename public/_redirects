@@ -1,0 +1,4 @@
+# Standalone deploy: the build links everything under /tools/seo-news/ (Astro `base`),
+# but the files sit at the root of dist/. Map the prefixed paths back onto them.
+/                   /tools/seo-news/   302
+/tools/seo-news/*   /:splat            200

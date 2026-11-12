@@ -1,0 +1,43 @@
+---
+import { formatDayShort } from '../lib/dates';
+import { dayHref } from '../lib/paths';
+import type { StoryGroup } from '../lib/query';
+import StoryCard from './StoryCard.astro';
+
+interface Props { group: StoryGroup }
+const { group } = Astro.props;
+const { lead, others, elsewhere } = group;
+---
+
+<li class="list-none">
+  <StoryCard story={lead} headingLevel="h3" />
+  {(others.length > 0 || elsewhere.length > 0) && (
+    <div class="ml-3 border-l pl-4 pt-3 sm:ml-5">
+      {others.length > 0 && (
+        <>
+          <p class="text-section-label uppercase text-muted-foreground">Also covered by {others.length} {others.length === 1 ? 'outlet' : 'outlets'}</p>
+          <ul class="mt-2 space-y-1.5">
+            {others.map((s) => (
+              <li class="text-sm leading-snug">
+                <span class:list={['font-medium', s.sourceCategory === 'official' ? 'text-primary' : 'text-foreground/80']}>{s.sourceName}:</span>{' '}
+                <a href={s.url} rel="noopener" target="_blank" class="text-muted-foreground underline-offset-4 hover:text-foreground hover:underline">{s.title}</a>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+      {elsewhere.length > 0 && (
+        <p class:list={['text-xs text-muted-foreground', others.length > 0 && 'mt-3']}>
+          Same story on other days:{' '}
+          {elsewhere.slice(0, 4).map((s, i) => (
+            <>
+              {i > 0 && ', '}
+              <a href={dayHref(s.day)} class="underline-offset-4 hover:text-foreground hover:underline">{formatDayShort(s.day)} ({s.sourceName})</a>
+            </>
+          ))}
+          {elsewhere.length > 4 && ` and ${elsewhere.length - 4} more`}
+        </p>
+      )}
+    </div>
+  )}
+</li>

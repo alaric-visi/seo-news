@@ -1,0 +1,36 @@
+---
+import Calendar from '../components/Calendar.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { loadNews } from '../lib/query';
+
+const data = await loadNews();
+const counts = new Map(data.days.map((d) => [d, data.byDay.get(d)!.length]));
+
+// Every month from the newest day back to the oldest, including empty ones.
+const months: string[] = [];
+if (data.days.length) {
+  const newest = data.days[0].slice(0, 7);
+  const oldest = data.days[data.days.length - 1].slice(0, 7);
+  let [y, m] = newest.split('-').map(Number);
+  for (let key = newest; key >= oldest; ) {
+    months.push(key);
+    m -= 1;
+    if (m === 0) { m = 12; y -= 1; }
+    key = `${y}-${String(m).padStart(2, '0')}`;
+  }
+}
+---
+
+<BaseLayout
+  title="SEO News Archive: Every Day in SEO by Month | Mike Higgins"
+  description="Browse the SEO News archive by day. Each date links to that day's Google announcements, algorithm update rollouts and search industry coverage."
+>
+  <header class="mb-8">
+    <p class="text-section-label uppercase text-primary">SEO News</p>
+    <h1 class="mt-3 font-display text-3xl font-light tracking-tight sm:text-4xl">Archive</h1>
+    <p class="mt-2 text-muted-foreground">{data.stories.length} stories across {data.days.length} days. Darker days had more news.</p>
+  </header>
+  <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    {months.map((m) => <Calendar month={m} counts={counts} today={data.today} id={`m-${m}`} />)}
+  </div>
+</BaseLayout>

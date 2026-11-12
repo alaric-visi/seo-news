@@ -1,0 +1,59 @@
+---
+import { formatDayLong, formatMonth } from '../lib/dates';
+import { dayHref } from '../lib/paths';
+
+interface Props {
+  /** YYYY-MM */
+  month: string;
+  counts: Map<string, number>;
+  selected?: string | null;
+  today: string;
+  /** Heading level for the month name. */
+  headingLevel?: 'h2' | 'h3';
+  id?: string;
+}
+
+const { month, counts, selected, today, headingLevel = 'h2', id } = Astro.props;
+const Heading = headingLevel;
+const [y, m] = month.split('-').map(Number);
+const daysInMonth = new Date(Date.UTC(y, m, 0)).getUTCDate();
+// Monday-first grid.
+const leading = (new Date(Date.UTC(y, m - 1, 1)).getUTCDay() + 6) % 7;
+const cells: (string | null)[] = [
+  ...Array(leading).fill(null),
+  ...Array.from({ length: daysInMonth }, (_, i) => `${month}-${String(i + 1).padStart(2, '0')}`),
+];
+const max = Math.max(1, ...[...counts.entries()].filter(([d]) => d.startsWith(month)).map(([, c]) => c));
+const level = (c: number) => (c === 0 ? 0 : c / max > 0.66 ? 3 : c / max > 0.33 ? 2 : 1);
+const total = cells.reduce((sum, d) => sum + (d ? counts.get(d) ?? 0 : 0), 0);
+---
+
+<section class="rounded-lg border bg-card p-4" id={id} aria-label={`${formatMonth(month)}: ${total} stories`}>
+  <div class="mb-3 flex items-baseline justify-between">
+    <Heading class="font-display text-sm font-medium">{formatMonth(month)}</Heading>
+    <span class="font-mono text-[11px] text-muted-foreground">{total} {total === 1 ? 'story' : 'stories'}</span>
+  </div>
+  <div class="grid grid-cols-7 gap-1 text-center font-mono text-[11px]" role="presentation">
+    {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d) => <span class="pb-1 text-muted-foreground" aria-hidden="true">{d}</span>)}
+    {cells.map((d) => {
+      if (!d) return <span aria-hidden="true"></span>;
+      const c = counts.get(d) ?? 0;
+      const lv = level(c);
+      const label = `${formatDayLong(d)}: ${c} ${c === 1 ? 'story' : 'stories'}`;
+      const cls = [
+        'flex aspect-square items-center justify-center rounded-sm',
+        lv === 0 && 'text-muted-foreground/50',
+        lv === 1 && 'bg-primary/20 text-foreground',
+        lv === 2 && 'bg-primary/45 text-foreground',
+        lv === 3 && 'bg-primary/80 text-primary-foreground',
+        d === selected && 'ring-2 ring-accent',
+        d === today && d !== selected && 'ring-1 ring-foreground/40',
+      ];
+      return c > 0 ? (
+        <a href={dayHref(d)} class:list={[...cls, 'transition-opacity hover:opacity-80']} aria-label={label} aria-current={d === selected ? 'date' : undefined} title={label}>{Number(d.slice(8))}</a>
+      ) : (
+        <span class:list={cls} title={label}>{Number(d.slice(8))}</span>
+      );
+    })}
+  </div>
+</section>

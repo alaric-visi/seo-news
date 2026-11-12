@@ -1,0 +1,18 @@
+---
+import { tagById } from '../config/tags';
+import { tagHref } from '../lib/paths';
+
+interface Props { tag: string; count?: number }
+const { tag, count } = Astro.props;
+const rule = tagById(tag);
+---
+
+{rule && (
+  <a
+    href={tagHref(tag)}
+    class="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] leading-5 text-muted-foreground transition-colors hover:border-primary/60 hover:text-foreground"
+  >
+    {rule.label}
+    {count !== undefined && <span class="font-mono text-[10px] opacity-70">{count}</span>}
+  </a>
+)}
