@@ -21,6 +21,10 @@ const description = dayDescription(date, stories);
 <BaseLayout
   title={title}
   description={description}
+  ogSlug={date}
+  ogType="article"
+  publishedTime={date}
+  ogAlt={`SEO News for ${formatDayLong(date)}: ${stories.length} stories`}
   jsonLd={collectionJsonLd({ name: `SEO News, ${formatDayLong(date)}`, description, url: new URL(Astro.url.pathname, Astro.site).toString(), stories })}
 >
   <DayView data={data} day={date} />

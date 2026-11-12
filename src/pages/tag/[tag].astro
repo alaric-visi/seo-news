@@ -31,6 +31,8 @@ const description = rule.intro.length > 160 ? `${rule.intro.slice(0, 157).replac
 <BaseLayout
   title={title}
   description={description}
+  ogSlug={`tag/${tag}`}
+  ogAlt={`SEO News: ${rule.label} news`}
   jsonLd={collectionJsonLd({ name: `${rule.label} news`, description: rule.intro, url: new URL(Astro.url.pathname, Astro.site).toString(), stories })}
 >
   <div class="workspace">

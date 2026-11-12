@@ -15,10 +15,38 @@ interface Props {
   jsonLd?: Record<string, unknown>;
   /** Which segment of the view switcher is current. */
   section?: 'today' | 'archive' | null;
+  /** Open Graph image slug under /og/ (see src/pages/og/[...slug].png.ts). */
+  ogSlug?: string;
+  /** Alt text for the Open Graph image. */
+  ogAlt?: string;
+  /** og:type: 'website' for the home page, 'article' for dated pages. */
+  ogType?: 'website' | 'article';
+  /** ISO date for article:published_time on day pages. */
+  publishedTime?: string;
 }
 
-const { title, description, jsonLd, section = null } = Astro.props;
+const { title, description, jsonLd, section = null, ogSlug = 'home', ogAlt, ogType = 'website', publishedTime } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site).toString();
+const ogImage = new URL(href(`og/${ogSlug}.png`), Astro.site).toString();
+const imageAlt = ogAlt ?? `SEO News: ${title}`;
+const logoUrl = new URL(href('icon-512.png'), Astro.site).toString();
+// Site-wide identity, merged into each page's JSON-LD.
+const siteJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  '@id': `${Astro.site}#website`,
+  name: 'SEO News',
+  alternateName: 'Every day in SEO, on one calendar',
+  url: Astro.site?.toString(),
+  inLanguage: 'en-GB',
+  image: logoUrl,
+  publisher: {
+    '@type': 'Person',
+    name: 'Mike Higgins',
+    url: 'https://mikehiggins.me.uk/',
+    image: logoUrl,
+  },
+};
 // Pages are indexable. SEO_NEWS_NOINDEX=true adds noindex everywhere (e.g. a staging deploy).
 // Astro turns "true" in env vars into a boolean, so compare as strings.
 const indexable = String(import.meta.env.SEO_NEWS_NOINDEX) !== 'true';
@@ -46,7 +74,10 @@ const builtAt = new Date().toISOString();
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#09090b" />
-    <link rel="icon" type="image/png" href={href('favicon.png')} />
+    <link rel="icon" type="image/svg+xml" href={href('favicon.svg')} />
+    <link rel="icon" type="image/png" sizes="32x32" href={href('favicon.png')} />
+    <link rel="apple-touch-icon" href={href('apple-touch-icon.png')} />
+    <link rel="manifest" href={href('site.webmanifest')} />
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
@@ -56,15 +87,27 @@ const builtAt = new Date().toISOString();
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
-    <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="SEO News, Mike Higgins" />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:site_name" content="SEO News" />
     <meta property="og:locale" content="en_GB" />
-    <meta name="twitter:card" content="summary" />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:secure_url" content={ogImage} />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={imageAlt} />
+    {ogType === 'article' && publishedTime && <meta property="article:published_time" content={publishedTime} />}
+    {ogType === 'article' && <meta property="article:author" content="https://mikehiggins.me.uk/" />}
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@mikejhiggins" />
+    <meta name="twitter:creator" content="@mikejhiggins" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={imageAlt} />
 
-    {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+    <script type="application/ld+json" set:html={JSON.stringify(siteJsonLd)} />
+    {jsonLd && <script type="application/ld+json" set:html={JSON.stringify({ ...jsonLd, image: ogImage })} />}
   </head>
   <body class="flex min-h-screen flex-col">
     <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[60] focus:rounded-md focus:bg-primary focus:px-3 focus:py-2 focus:text-primary-foreground">Skip to content</a>
@@ -77,9 +120,7 @@ const builtAt = new Date().toISOString();
         </a>
         <div class="title-group">
           <a href={href()} class="app-title">
-            <svg class="icon text-teal" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="4" width="18" height="17" rx="2" /><path d="M3 9h18M8 2v4M16 2v4" /><path d="M7 13h4M7 17h7" />
-            </svg>
+            <img src={href('logo.svg')} alt="" width="22" height="22" class="h-[22px] w-[22px]" />
             SEO News
           </a>
           <span class="app-subtitle">Every day in SEO, on one calendar</span>
