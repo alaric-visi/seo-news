@@ -10,7 +10,8 @@ export function collectionJsonLd(opts: { name: string; description: string; url:
     description: opts.description,
     url: opts.url,
     inLanguage: 'en-GB',
-    isPartOf: { '@type': 'WebSite', name: 'Mike Higgins', url: 'https://mikehiggins.me.uk/' },
+    isPartOf: { '@type': 'WebSite', name: 'SEO News', url: 'https://seo-news.mikehiggins.me.uk/' },
+    author: { '@type': 'Person', name: 'Mike Higgins', url: 'https://mikehiggins.me.uk/' },
     mainEntity: {
       '@type': 'ItemList',
       numberOfItems: opts.stories.length,

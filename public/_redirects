@@ -1,4 +1,3 @@
-# Standalone deploy: the build links everything under /tools/seo-news/ (Astro `base`),
-# but the files sit at the root of dist/. Map the prefixed paths back onto them.
-/                   /tools/seo-news/   302
-/tools/seo-news/*   /:splat            200
+# The app used to be served under /tools/seo-news/. Send any old links to the root.
+/tools/seo-news     /         301!
+/tools/seo-news/*   /:splat   301!

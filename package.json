@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "Every day in SEO, on one calendar. Daily SEO news aggregator served at mikehiggins.me.uk/tools/seo-news.",
+  "description": "Every day in SEO, on one calendar. Daily SEO news aggregator at seo-news.mikehiggins.me.uk.",
   "engines": {
     "node": ">=20.3"
   },

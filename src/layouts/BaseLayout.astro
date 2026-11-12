@@ -13,9 +13,9 @@ interface Props {
 
 const { title, description, jsonLd } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site).toString();
-// Every page stays noindex until the app is live at mikehiggins.me.uk/tools/seo-news.
+// Pages are indexable. SEO_NEWS_NOINDEX=true adds noindex everywhere (e.g. a staging deploy).
 // Astro turns "true" in env vars into a boolean, so compare as strings.
-const indexable = String(import.meta.env.SEO_NEWS_INDEXABLE) === 'true';
+const indexable = String(import.meta.env.SEO_NEWS_NOINDEX) !== 'true';
 const gaId = import.meta.env.PUBLIC_GA_ID;
 const path = Astro.url.pathname;
 const nav = [
@@ -53,8 +53,7 @@ const nav = [
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Mike Higgins" />
     <meta property="og:locale" content="en_GB" />
-    <meta property="og:image" content={new URL('/og-image.jpg', Astro.site)} />
-    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:card" content="summary" />
     <meta name="twitter:site" content="@mikejhiggins" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />

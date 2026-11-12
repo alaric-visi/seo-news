@@ -1,8 +1,8 @@
 # SEO News
 
 Every day in SEO, on one calendar. A daily aggregator of Google's own announcements,
-Search Status Dashboard rollouts and search-industry coverage. It is built to live at
-**mikehiggins.me.uk/tools/seo-news**, and runs as its own app during discovery.
+Search Status Dashboard rollouts and search-industry coverage, live at
+**https://seo-news.mikehiggins.me.uk/**.
 
 Each story shows its headline, source, time and a link to the original. Article text
 is never republished: we keep up to 280 characters of each feed's description for
@@ -28,7 +28,7 @@ Netlify build
 
 ## Pages
 
-All under `/tools/seo-news/`:
+On https://seo-news.mikehiggins.me.uk:
 
 | Path | |
 |---|---|
@@ -39,7 +39,7 @@ All under `/tools/seo-news/`:
 | `/rss.xml` | Our feed (latest 50 stories, linking to the originals) |
 | `/sitemap.xml` | The app's own sitemap |
 
-Every page is `noindex` until `SEO_NEWS_INDEXABLE=true` is set (see [Going live](#going-live)).
+Pages are indexable, and `robots.txt` points to the sitemap. Set `SEO_NEWS_NOINDEX=true` on a deploy (e.g. staging) to add `noindex` everywhere. Old `/tools/seo-news/…` links 301 to the root.
 
 ## Local development
 
@@ -50,7 +50,7 @@ npm run news:fetch            # fetch every feed into the store
 npm run news:fetch -- --dry-run          # fetch and parse only, write nothing
 npm run news:fetch -- --source=moz       # one source
 npm run news:summarise -- --dry-run      # show the DeepSeek requests without sending
-npm run dev                   # http://localhost:4321/tools/seo-news/
+npm run dev                   # http://localhost:4321/
 npm test
 ```
 
@@ -88,18 +88,10 @@ Connect this repository. Build settings come from `netlify.toml`. Environment va
 
 Never give Netlify the secret key. Create a build hook (Site configuration → Build hooks) and store it as `NETLIFY_BUILD_HOOK` in GitHub.
 
-## Going live
+## Search Console
 
-To serve the app at mikehiggins.me.uk/tools/seo-news without merging the code, add a
-proxy rewrite to the portfolio's Netlify config (`portfolio/netlify.toml` or `public/_redirects`):
-
-```
-/tools/seo-news/*  https://<this-site>.netlify.app/tools/seo-news/:splat  200
-```
-
-Then set `SEO_NEWS_INDEXABLE=true` on this Netlify site and rebuild. Canonical URLs already
-point to mikehiggins.me.uk. Add `https://mikehiggins.me.uk/tools/seo-news/sitemap.xml` to the
-portfolio's robots.txt or Search Console.
+Add `https://seo-news.mikehiggins.me.uk/` as a property in Google Search Console and Bing
+Webmaster Tools, and submit `https://seo-news.mikehiggins.me.uk/sitemap.xml`.
 
 ## AI summaries
 

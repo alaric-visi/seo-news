@@ -1,4 +1,4 @@
-/** Site-relative links under the app's base path (/tools/seo-news/), with trailing slashes. */
+/** Site-relative links (respecting Astro's base path), with trailing slashes. */
 const BASE = import.meta.env.BASE_URL.replace(/\/?$/, '/');
 
 export function href(path = '', hash?: string): string {

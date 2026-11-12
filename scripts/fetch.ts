@@ -14,7 +14,7 @@ import { getStore } from '../src/lib/store';
 import type { GoogleIncident, NewStory, SourceResult } from '../src/lib/types';
 import { flag, loadEnv } from './env';
 
-const USER_AGENT = 'SEO-News-Aggregator/1.0 (+https://mikehiggins.me.uk/tools/seo-news/)';
+const USER_AGENT = 'SEO-News-Aggregator/1.0 (+https://seo-news.mikehiggins.me.uk/)';
 const RETRY_DELAY_MS = 3_000;
 
 loadEnv();
