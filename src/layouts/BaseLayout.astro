@@ -5,7 +5,6 @@ import '@fontsource/dm-mono/400.css';
 import '@fontsource/dm-mono/500.css';
 import '../styles/global.css';
 import AboutDialog from '../components/AboutDialog.astro';
-import SiteNav from '../components/SiteNav.astro';
 import { formatDayShort, formatTime, londonDay } from '../lib/dates';
 import { archiveHref, href, rssHref } from '../lib/paths';
 import { loadNews, openIncidents } from '../lib/query';
@@ -69,7 +68,6 @@ const builtAt = new Date().toISOString();
   </head>
   <body class="flex min-h-screen flex-col">
     <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[60] focus:rounded-md focus:bg-primary focus:px-3 focus:py-2 focus:text-primary-foreground">Skip to content</a>
-    <SiteNav />
 
     <header class="app-header">
       <div class="header-left">
