@@ -76,8 +76,9 @@ export const SOURCES: SourceConfig[] = [
     homepage: 'https://searchengineland.com/',
     category: 'press',
     format: 'feed',
-    enabled: true,
-    notes: 'Returned 403 to automated requests on 2026-11-12. Left on to test from GitHub Actions; disable if it keeps failing.',
+    // Returns 403 to automated requests, locally and from GitHub Actions (2026-11-12).
+    enabled: false,
+    notes: 'Blocks automated feed requests (403). Re-enable only if they allow it.',
   },
   {
     id: 'search-engine-journal',
