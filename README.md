@@ -1,109 +1,86 @@
+<div align="center">
+
+<img src="public/logo.svg" width="88" height="88" alt="SEO News logo" />
+
 # SEO News
 
-Every day in SEO, on one calendar. A daily aggregator of Google's and Bing's own announcements,
-Search Status Dashboard rollouts and search-industry coverage, live at
-**https://seo-news.mikehiggins.me.uk/**.
+**Every day in SEO, on one calendar.**
 
-Each story shows its headline, source, time and a link to the original. Article text
-is never republished: we keep up to 280 characters of each feed's description for
-tagging and AI summaries, and never show it.
+[seo-news.mikehiggins.me.uk](https://seo-news.mikehiggins.me.uk/) · [RSS feed](https://seo-news.mikehiggins.me.uk/rss.xml) · [Archive](https://seo-news.mikehiggins.me.uk/archive/)
+
+<a href="https://github.com/alaric-visi/seo-news/raw/main/media/seo-news-launch.mp4">
+  <img src="media/seo-news-launch.gif" width="860" alt="SEO News launch film: nineteen source tabs collapse into one calendar, a day opens to Google's core update with coverage grouped under it, the rollout progress, an AI brief and the archive" />
+</a>
+
+<sub>▶ <a href="https://github.com/alaric-visi/seo-news/raw/main/media/seo-news-launch.mp4">Watch the 26-second film with sound (MP4, 1080p)</a></sub>
+
+</div>
+
+---
+
+## What it is
+
+Keeping up with SEO means checking a lot of places every morning: Google's blogs and Search Status
+Dashboard, Bing, the trade press, tool vendors and a handful of experts. SEO News checks all of them
+for you once a day and puts everything on one calendar.
+
+Pick a day and you see what happened in search that day: Google's and Bing's own announcements
+first, then the coverage, grouped by story, with a short summary of each. Every story links to the
+original article.
+
+## What you get
+
+- **A page for every day.** Everything published that day, each story linking to the original article.
+- **Official posts first.** Announcements from Google and Bing are marked *Official* and lead the page, so you can tell them apart from commentary.
+- **Stories grouped by event.** When Google releases a core update and five outlets write about it, you see one announcement with the coverage tucked underneath, not six separate items.
+- **Google updates panel.** Core, spam and other ranking updates from the Google Search Status Dashboard, with how many days each rollout has been running against Google's stated window, plus recently completed ones.
+- **The day in brief.** A short overview of each busy day, and a one-line summary under every story.
+- **Topics.** Stories are tagged (core update, spam update, AI Overviews & AI Mode, OpenAI & ChatGPT, Bing, Search Console and more), and each topic has its own page.
+- **An archive.** Month calendars shaded by how much happened, so busy days stand out.
+- **RSS.** Follow the aggregated feed in any reader: [`/rss.xml`](https://seo-news.mikehiggins.me.uk/rss.xml).
 
 ## How it works
 
 ```
-GitHub Action (05:15 UTC daily)
-  1. npm run news:fetch       feeds -> Supabase (new stories, Google incidents, run log)
-  2. npm run news:summarise   DeepSeek one-line summaries + a daily intro -> Supabase
-  3. POST Netlify build hook
-Netlify build
-  Astro reads Supabase (read-only key) and renders static pages
+Every morning at about 05:15 UTC
+  1. Fetch    Read the latest posts from 19 sources (RSS, Atom and Google's status data)
+  2. Save     Store new stories, skipping anything already seen
+  3. Organise Tag each story by topic and group stories about the same event
+  4. Summarise Write a one-line summary per story and a brief for the day (AI)
+  5. Publish  Rebuild the site, the RSS feed and the sitemap
 ```
 
-- **Sources** live in [`src/config/sources.ts`](src/config/sources.ts). Add, remove or set `enabled: false`.
-- **Tags** are keyword rules in [`src/config/tags.ts`](src/config/tags.ts). They are applied at build time, so editing a rule re-tags the whole archive.
-- **Grouping** ([`src/lib/cluster.ts`](src/lib/cluster.ts)) joins stories about the same named Google update ("November 2026 core update") and near-identical headlines from different outlets within 48 hours.
-- **Days** are London days, worked out when a story is first saved.
-- A failing or malformed feed is logged (and shown as a warning in the Action) and the rest carry on. The run only fails if every source fails.
-- If Supabase is unreachable during a Netlify build, the build fails and Netlify keeps serving the previous deploy.
+- **Days follow UK time** (London), so a day's page is the same calendar day for every story on it.
+- **If a source is down**, it's skipped for that run and the rest carry on; it's picked up again the next morning.
+- **Nothing is republished.** Each story is a headline, its source, the time and a link. A short part of each feed's description is kept privately to tag stories and write summaries, and is never shown.
+- **AI is labelled.** Summaries and day briefs are written by AI (DeepSeek) from headlines and feed descriptions only. They're marked *AI* on the page, so check the original before relying on them.
 
-## Pages
+## Sources
 
-On https://seo-news.mikehiggins.me.uk:
-
-| Path | |
+| Type | Sources |
 |---|---|
-| `/` | Latest full day, "so far today", Google updates panel, calendar |
-| `/2026-11-12/` | One day: AI intro, stories grouped by event, previous/next day |
-| `/archive/` | Month calendars |
-| `/tag/core-update/` | One page per tag that has stories |
-| `/rss.xml` | Our feed (latest 50 stories, linking to the originals) |
-| `/sitemap.xml` | The app's own sitemap |
+| **Official** | [Google Search Central Blog](https://developers.google.com/search/blog) · [Google Search Status Dashboard](https://status.search.google.com/) · [Google Search documentation updates](https://developers.google.com/search/updates) · [Google The Keyword: Search](https://blog.google/products/search/) · [Bing Search Blog](https://blogs.bing.com/search/) · [Bing Webmaster Blog](https://blogs.bing.com/webmaster/) |
+| **Press** | [Search Engine Journal](https://www.searchenginejournal.com/) · [Search Engine Roundtable](https://www.seroundtable.com/) · [Search Engine Watch](https://www.searchenginewatch.com/) |
+| **Tool vendors** | [Ahrefs](https://ahrefs.com/blog/) · [Moz](https://moz.com/blog) · [Semrush](https://www.semrush.com/blog/) · [Sistrix](https://www.sistrix.com/blog/) · [Screaming Frog](https://www.screamingfrog.co.uk/blog/) · [Yoast](https://yoast.com/seo-blog/) |
+| **Experts & community** | [GSQi (Glenn Gabe)](https://www.gsqi.com/marketing-blog/) · [Marie Haynes](https://www.mariehaynes.com/blog/) · [Growth Memo (Kevin Indig)](https://www.growth-memo.com/) · [Hacker News](https://news.ycombinator.com/) (SEO stories with 50+ points) |
 
-Pages are indexable, and `robots.txt` points to the sitemap. Set `SEO_NEWS_NOINDEX=true` on a deploy (e.g. staging) to add `noindex` everywhere. Old `/tools/seo-news/…` links 301 to the root.
+Know a feed that should be here? [Open an issue](https://github.com/alaric-visi/seo-news/issues).
 
-## Local development
+## Built with
 
-```bash
-npm install
-cp .env.example .env          # set NEWS_STORE=local to work without Supabase
-npm run news:fetch            # fetch every feed into the store
-npm run news:fetch -- --dry-run          # fetch and parse only, write nothing
-npm run news:fetch -- --source=moz       # one source
-npm run news:summarise -- --dry-run      # show the DeepSeek requests without sending
-npm run dev                   # http://localhost:4321/
-npm test
-```
+[Astro](https://astro.build/) for the site, [Supabase](https://supabase.com/) to keep the history,
+[GitHub Actions](https://github.com/features/actions) for the daily run, [Netlify](https://www.netlify.com/)
+for hosting and [DeepSeek](https://www.deepseek.com/) for summaries. The site is static, so pages are fast and
+keep working even if a service is briefly down.
 
-With `NEWS_STORE=local` everything is stored in `.data/local-store.json` (git-ignored).
+The launch film above is made in code too: one animated page rendered frame by frame, with an original
+score. Its source is in [`media/launch/`](media/launch/).
 
-## Setup
+## Running it yourself
 
-### 1. Supabase (project `seo-news`)
+Setup, configuration and local development are in [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md).
+You can run the whole pipeline locally without any accounts.
 
-Run [`supabase/migrations/20261112000000_init.sql`](supabase/migrations/20261112000000_init.sql) once in the
-SQL editor. Row-level security lets the publishable key read the public tables; only
-the secret key can write.
+---
 
-### 2. GitHub repository secrets
-
-| Secret | Value |
-|---|---|
-| `SUPABASE_URL` | `https://xayayfpwxnmtrlojjcua.supabase.co` |
-| `SUPABASE_SECRET_KEY` | Supabase secret (or legacy `service_role`) key |
-| `DEEPSEEK_API_KEY` | DeepSeek API key (optional: without it summaries are skipped) |
-| `NETLIFY_BUILD_HOOK` | Netlify build hook URL |
-
-Optional repository variable `DEEPSEEK_MODEL`: `deepseek-flash` (default) or `deepseek-v4-pro`.
-
-### 3. Netlify site
-
-Connect this repository. Build settings come from `netlify.toml`. Environment variables:
-
-| Variable | Value |
-|---|---|
-| `SUPABASE_URL` | as above |
-| `SUPABASE_PUBLISHABLE_KEY` | Supabase publishable (or legacy `anon`) key, read-only |
-| `NEWS_STORE` | `supabase` |
-| `PUBLIC_GA_ID` | optional, e.g. `G-RV46FH6BMG` |
-
-Never give Netlify the secret key. Create a build hook (Site configuration → Build hooks) and store it as `NETLIFY_BUILD_HOOK` in GitHub.
-
-## Search Console
-
-Add `https://seo-news.mikehiggins.me.uk/` as a property in Google Search Console and Bing
-Webmaster Tools, and submit `https://seo-news.mikehiggins.me.uk/sitemap.xml`.
-
-## AI summaries
-
-[`scripts/summarise.ts`](scripts/summarise.ts) sends one request per day to DeepSeek
-(`deepseek-flash`, JSON mode, thinking off) containing that day's headlines and
-excerpts. It writes one sentence per new story and, for days with 5+ stories, a short
-intro, which is rewritten when late stories arrive. The prompt (in
-[`src/lib/llm/prompt.ts`](src/lib/llm/prompt.ts)) allows only facts in the headline and
-excerpt. Every summary is labelled "AI summary" on the page and stored with its model
-and prompt version. At current prices this costs well under $1 a month.
-
-## Later
-
-- **Email digest:** `groupsForDay()` in `src/lib/query.ts` already produces one day's stories, grouped; add a `digest_sends` table and a step in the Action.
-- **Volatility data:** add a `volatility_readings` table and a panel beside Google updates.
+<div align="center"><sub>Made by <a href="https://mikehiggins.me.uk/">Mike Higgins</a></sub></div>

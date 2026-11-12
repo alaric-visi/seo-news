@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8" />
+<title>SEO News: launch film</title>
+<style>
+  @font-face { font-family: 'Inter'; src: url(fonts/inter.woff2) format('woff2'); font-weight: 100 900; }
+  @font-face { font-family: 'DM Mono'; src: url(fonts/dmmono-400.woff2) format('woff2'); font-weight: 400; }
+  @font-face { font-family: 'DM Mono'; src: url(fonts/dmmono-500.woff2) format('woff2'); font-weight: 500; }
+  html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; background: #09090b; }
+  #stage { position: relative; width: 1920px; height: 1080px; overflow: hidden; font-family: 'Inter', sans-serif; color: #f4f4f5;
+    -webkit-font-smoothing: antialiased; font-feature-settings: 'ss01', 'cv11'; }
+  #bg, #trail, #world, #hud { position: absolute; left: 0; top: 0; }
+  #bg { width: 1920px; height: 1080px; }
+  #world { transform-origin: 0 0; }
+  .a { position: absolute; }
+  .mono { font-family: 'DM Mono', monospace; }
+  .fill { position: absolute; inset: 0; }
+  .center { display: flex; align-items: center; justify-content: center; }
+  .chip { position: absolute; display: flex; align-items: center; gap: 10px; white-space: nowrap; font-size: 22px; font-weight: 500;
+    padding: 0 18px; height: 50px; border-radius: 10px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.10); }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .pill { display: inline-flex; align-items: center; font-family: 'DM Mono', monospace; font-size: 20px; height: 36px; padding: 0 14px;
+    border-radius: 999px; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.03); color: #a1a1aa; white-space: nowrap; }
+  .pill.teal { color: #5eead4; border-color: rgba(45,212,191,0.35); background: rgba(45,212,191,0.12); }
+  .label { font-family: 'DM Mono', monospace; font-size: 18px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #a1a1aa; }
+  .cell { position: absolute; border-radius: 12px; border: 1px solid transparent; font-family: 'DM Mono', monospace; }
+  .cell .n { position: absolute; left: 12px; top: 8px; font-size: 18px; }
+  .cell .c { position: absolute; right: 12px; bottom: 8px; font-size: 16px; }
+  .odo { display: inline-flex; overflow: hidden; height: 1.15em; line-height: 1.15em; vertical-align: bottom; }
+  .odo .slot { display: inline-block; position: relative; height: 1.15em; overflow: hidden; }
+  .odo .strip { position: absolute; left: 0; top: 0; display: flex; flex-direction: column; }
+  .odo .strip span { height: 1.15em; display: block; text-align: center; }
+  .word { display: inline-block; white-space: pre; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="bg"></div>
+  <canvas id="trail" width="1920" height="1080"></canvas>
+  <div id="world"></div>
+  <div id="hud"></div>
+</div>
+<script src="film.js"></script>
+</body>
+</html>
