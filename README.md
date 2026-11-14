@@ -6,7 +6,9 @@
 
 **Every day in SEO, on one calendar.**
 
-[seo-news.mikehiggins.me.uk](https://seo-news.mikehiggins.me.uk/) · [RSS feed](https://seo-news.mikehiggins.me.uk/rss.xml) · [Archive](https://seo-news.mikehiggins.me.uk/archive/)
+### [https://seo-news.mikehiggins.me.uk/](https://seo-news.mikehiggins.me.uk/)
+
+[Live Calendar](https://seo-news.mikehiggins.me.uk/) · [RSS Feed](https://seo-news.mikehiggins.me.uk/rss.xml) · [Archive](https://seo-news.mikehiggins.me.uk/archive/)
 
 <a href="https://github.com/alaric-visi/seo-news/raw/main/media/seo-news-launch.mp4">
   <img src="media/seo-news-launch.gif" width="860" alt="SEO News launch film: nineteen source tabs collapse into one calendar, a day opens to Google's core update with coverage grouped under it, the rollout progress, an AI brief and the archive" />
@@ -20,7 +22,9 @@
 
 ## Technical Overview
 
-SEO News is an automated daily aggregator and archive for search engine optimisation developments. It monitors official search engine documentation, status dashboards, trade publications, tool vendors and industry analysts. Rather than republishing external copy, the platform acts as an indexed catalogue: it tracks publication timestamps, identifies duplicate coverage across outlets, maps ongoing Google algorithm rollouts and generates concise, fact-checked AI briefings.
+> **Live Application:** [https://seo-news.mikehiggins.me.uk/](https://seo-news.mikehiggins.me.uk/)
+
+SEO News ([https://seo-news.mikehiggins.me.uk/](https://seo-news.mikehiggins.me.uk/)) is an automated daily aggregator and archive for search engine optimisation developments. It monitors official search engine documentation, status dashboards, trade publications, tool vendors and industry analysts. Rather than republishing external copy, the platform acts as an indexed catalogue: it tracks publication timestamps, identifies duplicate coverage across outlets, maps ongoing Google algorithm rollouts and generates concise, fact-checked AI briefings.
 
 The application is engineered as an immutable static site generated with Astro 5 and hosted on Netlify, backed by a managed PostgreSQL instance on Supabase. A scheduled ingestion pipeline runs each morning via GitHub Actions to fetch, normalise, cluster, tag and summarise updates before triggering a fresh production build.
 
@@ -503,4 +507,4 @@ npm run preview
 
 ---
 
-<div align="center"><sub>Maintained by <a href="https://mikehiggins.me.uk/">Mike Higgins</a></sub></div>
+<div align="center"><sub><a href="https://seo-news.mikehiggins.me.uk/">https://seo-news.mikehiggins.me.uk/</a> · Maintained by <a href="https://mikehiggins.me.uk/">Mike Higgins</a></sub></div>
