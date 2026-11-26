@@ -318,7 +318,8 @@ The user-facing site is pre-rendered into static HTML, CSS and asset bundles usi
 | Route | Template File | Architectural Purpose |
 |---|---|---|
 | `/` | `src/pages/index.astro` | Dynamic edition resolving the latest complete day alongside an active "so far today" ledger for early-morning updates. |
-| `/[date]/` | `src/pages/[date].astro` | Static daily edition showing the day's AI intro, grouped event clusters, timeline progress and day navigation. |
+| `/[date]/` | `src/pages/[date].astro` | Descriptive daily edition (`/YYYY-MM-DD-<lead-story-slug>/` with 301 redirects from `/YYYY-MM-DD/`) showing the day's AI intro, grouped event clusters and day navigation. |
+| `/updates/[slug]/` | `src/pages/updates/[slug].astro` | Dedicated Google algorithm update hub showing official status timelines, rollout progress and chronological industry coverage. |
 | `/archive/` | `src/pages/archive.astro` | Multi-month density calendar shaded according to publication volume. |
 | `/tag/[tag]/` | `src/pages/tag/[tag].astro` | Historical topic archive aggregating coverage filtered by taxonomy rules. |
 | `/rss.xml` | `src/pages/rss.xml.ts` | Syndicate feed publishing the 50 most recent stories with outbound source links. |

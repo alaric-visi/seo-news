@@ -5,7 +5,8 @@ import { addDays, londonDay, parseFeedDate } from '../src/lib/dates';
 import { toStories } from '../src/lib/ingest';
 import { FeedParseError, parseFeed, parseGoogleStatus } from '../src/lib/parse';
 import { tagsFor } from '../src/lib/tagging';
-import { cleanExcerpt, decodeEntities, plainText, truncate } from '../src/lib/text';
+import { cleanExcerpt, decodeEntities, plainText, slugify, truncate } from '../src/lib/text';
+import { dayHeading, dayTitle } from '../src/lib/seo';
 import type { Story } from '../src/lib/types';
 import { canonicalUrl } from '../src/lib/url';
 import { ATOM, RDF, RSS_FEEDBURNER, RSS_SHARED_LINKS, STATUS_JSON } from './fixtures';
@@ -117,6 +118,18 @@ describe('text and URLs', () => {
   it('canonicalises URLs', () => {
     expect(canonicalUrl('http://WWW.Example.com/a/?utm_source=x&b=2&a=1#frag')).toBe('https://www.example.com/a?a=1&b=2');
     expect(canonicalUrl('mailto:x@example.com')).toBeNull();
+  });
+  it('slugifies headlines into descriptive keyword URL slugs', () => {
+    expect(slugify('Google: November 2026 core update')).toBe('google-november-2026-core-update');
+    expect(slugify('May 2026 core update')).toBe('may-2026-core-update');
+    expect(slugify("Google's Search Console adds AI Overviews report")).toBe('google-search-console-adds-ai-overviews-report');
+  });
+  it('builds descriptive daily titles and headings from lead story groups', () => {
+    const lead: any = { title: 'Google: November 2026 core update' };
+    const second: any = { title: 'Bing Webmaster Tools update' };
+    expect(dayHeading('2026-11-10', [{ lead, others: [], elsewhere: [] }])).toBe('Google: November 2026 core update');
+    expect(dayTitle('2026-11-10', [{ lead, others: [], elsewhere: [] }, { lead: second, others: [], elsewhere: [] }]))
+      .toBe('Google: November 2026 core update & Bing Webmaster Tools update: SEO News (10 Nov 2026) | Mike Higgins');
   });
 });
 

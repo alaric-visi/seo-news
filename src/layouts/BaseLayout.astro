@@ -6,7 +6,7 @@ import '@fontsource/dm-mono/500.css';
 import '../styles/global.css';
 import AboutDialog from '../components/AboutDialog.astro';
 import { formatDayShort, formatTime, londonDay } from '../lib/dates';
-import { archiveHref, href, rssHref } from '../lib/paths';
+import { archiveHref, href, rssHref, updateHref } from '../lib/paths';
 import { loadNews, openIncidents } from '../lib/query';
 
 interface Props {
@@ -133,7 +133,7 @@ const builtAt = new Date().toISOString();
           {rolling.map((i) => (
             <>
               <span aria-hidden="true">&middot;</span>
-              <span class="header-pill live" title={`Rolling out since ${formatDayShort(londonDay(i.beginAt))}`}>{i.title} rolling out</span>
+              <a href={updateHref(data.incidentSlugs.get(i.id)!)} class="header-pill live hover:underline" title={`Rolling out since ${formatDayShort(londonDay(i.beginAt))}`}>{i.title} rolling out</a>
             </>
           ))}
         </div>

@@ -6,6 +6,7 @@ interface Props {
   /** YYYY-MM */
   month: string;
   counts: Map<string, number>;
+  daySlugs?: ReadonlyMap<string, string>;
   selected?: string | null;
   today: string;
   id?: string;
@@ -13,7 +14,7 @@ interface Props {
   variant?: 'card' | 'bare';
 }
 
-const { month, counts, selected, today, id, variant = 'card' } = Astro.props;
+const { month, counts, daySlugs, selected, today, id, variant = 'card' } = Astro.props;
 // Inside the sidebar the panel header is already an h2.
 const Heading = variant === 'bare' ? 'h3' : 'h2';
 const [y, m] = month.split('-').map(Number);
@@ -51,7 +52,7 @@ const total = cells.reduce((sum, d) => sum + (d ? counts.get(d) ?? 0 : 0), 0);
         d === today && d !== selected && 'outline outline-1 outline-offset-1 outline-white/40',
       ];
       return c > 0 ? (
-        <a href={dayHref(d)} class:list={[...cls, 'transition-[filter] hover:brightness-125']} aria-label={label} aria-current={d === selected ? 'date' : undefined} title={label}>{Number(d.slice(8))}</a>
+        <a href={dayHref(d, daySlugs)} class:list={[...cls, 'transition-[filter] hover:brightness-125']} aria-label={label} aria-current={d === selected ? 'date' : undefined} title={label}>{Number(d.slice(8))}</a>
       ) : (
         <span class:list={cls} title={label}>{Number(d.slice(8))}</span>
       );

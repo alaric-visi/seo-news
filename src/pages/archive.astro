@@ -38,7 +38,7 @@ if (data.days.length) {
       <h1 id="archive-heading" class="text-2xl font-semibold tracking-[-0.02em] text-white sm:text-[28px]">SEO News archive</h1>
       <p class="mt-1 text-[13px] text-muted-foreground">Pick a day to see its stories. Brighter days had more news.</p>
       <div class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {months.map((m) => <Calendar month={m} counts={counts} today={data.today} id={`m-${m}`} />)}
+        {months.map((m) => <Calendar month={m} counts={counts} daySlugs={data.daySlugs} today={data.today} id={`m-${m}`} />)}
       </div>
     </div>
   </section>

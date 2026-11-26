@@ -49,3 +49,40 @@ export function cleanExcerpt(input: string): string {
     .replace(/\s*…\s*$/, '…')
     .trim();
 }
+
+const SLUG_STOPWORDS = new Set([
+  'a', 'an', 'the', 'and', 'or', 'but', 'for', 'nor', 'on', 'at', 'to', 'from', 'by', 'with',
+  'in', 'of', 'into', 'onto', 'upon', 'as', 'is', 'are', 'was', 'were', 'be', 'been', 'being',
+  'has', 'have', 'had', 'do', 'does', 'did', 'will', 'would', 'shall', 'should', 'can', 'could',
+  'might', 'must', 'that', 'this', 'these', 'those', 'it', 'its', 'how', 'why', 'what',
+  'when', 'where', 'who', 'whom', 'which', 'your', 'you', 'our', 'we', 'their', 'they', 'about',
+  'over', 'after', 'before', 'more', 'most', 'some', 'any', 'new', 'now', 'here', 'via', 'per',
+]);
+
+/**
+ * Turns a headline or title into a concise, descriptive URL slug.
+ * Drops common stopwords when enough content words exist, capped at maxWords and maxChars.
+ */
+export function slugify(input: string, maxWords = 8, maxChars = 60): string {
+  const rawTokens = plainText(input)
+    .toLowerCase()
+    .replace(/[’']s\b/g, '')
+    .replace(/[’']/g, '')
+    .split(/[^a-z0-9]+/)
+    .filter(Boolean);
+  if (!rawTokens.length) return '';
+
+  const contentTokens = rawTokens.filter((t) => !SLUG_STOPWORDS.has(t));
+  const source = contentTokens.length >= 3 ? contentTokens : rawTokens;
+
+  const picked: string[] = [];
+  let len = 0;
+  for (const token of source) {
+    if (picked.length >= maxWords) break;
+    const nextLen = len === 0 ? token.length : len + 1 + token.length;
+    if (nextLen > maxChars && picked.length > 0) break;
+    picked.push(token);
+    len = nextLen;
+  }
+  return picked.join('-');
+}

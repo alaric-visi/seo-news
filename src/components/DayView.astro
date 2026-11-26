@@ -2,6 +2,7 @@
 import { activeTags, groupsForDay, type NewsData, type StoryView } from '../lib/query';
 import { formatDayLong, formatDayShort, formatTime } from '../lib/dates';
 import { archiveHref, dayHref } from '../lib/paths';
+import { dayHeading } from '../lib/seo';
 import Calendar from './Calendar.astro';
 import GoogleUpdatesPanel from './GoogleUpdatesPanel.astro';
 import StoryGroup from './StoryGroup.astro';
@@ -41,27 +42,34 @@ const label = isToday ? 'Today' : isHome && isYesterday ? 'Yesterday' : isHome ?
         {official > 0 && <span class="panel-meta">{official} official</span>}
       </div>
       <nav aria-label="Other days" class="flex items-center gap-1.5">
-        {older && <a href={dayHref(older)} rel="prev" class="btn btn-xs">← {formatDayShort(older)}</a>}
+        {older && <a href={dayHref(older, data.daySlugs)} rel="prev" class="btn btn-xs">← {formatDayShort(older)}</a>}
         <a href={archiveHref(day.slice(0, 7))} class="btn btn-xs">Archive</a>
-        {newer && <a href={dayHref(newer)} rel="next" class="btn btn-xs">{formatDayShort(newer)} →</a>}
+        {newer && <a href={dayHref(newer, data.daySlugs)} rel="next" class="btn btn-xs">{formatDayShort(newer)} →</a>}
       </nav>
     </div>
 
     <div class="panel-body">
+      {!isHome && (
+        <p class="mono mb-1 text-[12px] text-accent">
+          <time datetime={day}>{formatDayLong(day)}</time>
+        </p>
+      )}
       <h1 id="day-heading" class="text-2xl font-semibold tracking-[-0.02em] text-white sm:text-[28px]">
-        {isHome ? <>SEO News <span class="text-muted-foreground font-normal">· {formatDayLong(day)}</span></> : <time datetime={day}>{formatDayLong(day)}</time>}
+        {isHome ? <>SEO News <span class="text-muted-foreground font-normal">· {formatDayLong(day)}</span></> : dayHeading(day, groups)}
       </h1>
       <p class="mt-1 text-[13px] text-muted-foreground">
         {isHome
           ? "Google's announcements, algorithm updates and the industry's coverage, grouped by story."
-          : `SEO and Google Search news from ${formatDayLong(day)}, grouped by story.`}
+          : stories.length > 1
+            ? `Plus ${stories.length - 1} more SEO and Google Search ${stories.length - 1 === 1 ? 'story' : 'stories'} from ${formatDayLong(day)}, grouped by event.`
+            : `SEO and Google Search news from ${formatDayLong(day)}.`}
       </p>
 
       {soFarToday.length > 0 && (
         <section aria-labelledby="so-far-today" class="card mt-5 border-dashed">
           <div class="mb-2 flex items-baseline justify-between gap-4">
             <h2 id="so-far-today" class="section-label">So far today</h2>
-            <a href={dayHref(data.today)} class="mono text-[11px] text-accent hover:underline">{formatDayShort(data.today)} →</a>
+            <a href={dayHref(data.today, data.daySlugs)} class="mono text-[11px] text-accent hover:underline">{formatDayShort(data.today)} →</a>
           </div>
           <ul class="space-y-1">
             {soFarToday.map((s) => (
@@ -89,7 +97,7 @@ const label = isToday ? 'Today' : isHome && isYesterday ? 'Yesterday' : isHome ?
 
       <h2 class="section-label mb-3 mt-6">Stories</h2>
       <ol class="space-y-3">
-        {groups.map((g) => <StoryGroup group={g} />)}
+        {groups.map((g) => <StoryGroup group={g} daySlugs={data.daySlugs} />)}
       </ol>
     </div>
   </section>
@@ -102,7 +110,7 @@ const label = isToday ? 'Today' : isHome && isYesterday ? 'Yesterday' : isHome ?
         <a href={archiveHref()} class="btn btn-xs">All months</a>
       </div>
       <div class="p-4">
-        <Calendar month={day.slice(0, 7)} counts={counts} selected={day} today={data.today} variant="bare" />
+        <Calendar month={day.slice(0, 7)} counts={counts} daySlugs={data.daySlugs} selected={day} today={data.today} variant="bare" />
       </div>
     </section>
     <section class="side-section" aria-labelledby="topics-heading">

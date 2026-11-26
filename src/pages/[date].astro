@@ -3,29 +3,34 @@ import type { GetStaticPaths } from 'astro';
 import DayView from '../components/DayView.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { formatDayLong } from '../lib/dates';
-import { loadNews } from '../lib/query';
-import { collectionJsonLd, dayDescription } from '../lib/seo';
+import { groupsForDay, loadNews } from '../lib/query';
+import { collectionJsonLd, dayDescription, dayHeading, dayTitle } from '../lib/seo';
 
 export const getStaticPaths = (async () => {
   const data = await loadNews();
-  return data.days.map((date) => ({ params: { date } }));
+  return data.days.map((day) => ({
+    params: { date: data.daySlugs.get(day) ?? day },
+    props: { day },
+  }));
 }) satisfies GetStaticPaths;
 
-const { date } = Astro.params;
+const { day } = Astro.props as { day: string };
 const data = await loadNews();
-const stories = data.byDay.get(date)!;
-const title = `SEO News for ${formatDayLong(date)} | Mike Higgins`;
-const description = dayDescription(date, stories);
+const stories = data.byDay.get(day)!;
+const groups = groupsForDay(data, day);
+const title = dayTitle(day, groups);
+const heading = dayHeading(day, groups);
+const description = dayDescription(day, stories);
 ---
 
 <BaseLayout
   title={title}
   description={description}
-  ogSlug={date}
+  ogSlug={day}
   ogType="article"
-  publishedTime={date}
-  ogAlt={`SEO News for ${formatDayLong(date)}: ${stories.length} stories`}
-  jsonLd={collectionJsonLd({ name: `SEO News, ${formatDayLong(date)}`, description, url: new URL(Astro.url.pathname, Astro.site).toString(), stories })}
+  publishedTime={day}
+  ogAlt={`SEO News for ${formatDayLong(day)}: ${heading}`}
+  jsonLd={collectionJsonLd({ name: `${heading} (${formatDayLong(day)})`, description, url: new URL(Astro.url.pathname, Astro.site).toString(), stories })}
 >
-  <DayView data={data} day={date} />
+  <DayView data={data} day={day} />
 </BaseLayout>

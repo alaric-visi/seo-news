@@ -51,7 +51,7 @@ const description = rule.intro.length > 160 ? `${rule.intro.slice(0, 157).replac
           {[...byDay.entries()].map(([day, list]) => (
             <section aria-labelledby={`d-${day}`}>
               <h2 id={`d-${day}`} class="section-label mb-2.5">
-                <a href={dayHref(day)} class="hover:text-foreground">{formatDayLong(day)}</a>
+                <a href={dayHref(day, data.daySlugs)} class="hover:text-foreground">{formatDayLong(day)}</a>
               </h2>
               <ul class="space-y-3">
                 {list.map((s) => <li class="list-none"><StoryCard story={s} /></li>)}

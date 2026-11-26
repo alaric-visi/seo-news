@@ -8,7 +8,9 @@ export function href(path = '', hash?: string): string {
   return hash ? `${url}#${hash}` : url;
 }
 
-export const dayHref = (day: string) => href(day);
+export const dayHref = (dayOrSlug: string, daySlugs?: ReadonlyMap<string, string>) =>
+  href(daySlugs?.get(dayOrSlug) ?? dayOrSlug);
+export const updateHref = (slug: string) => href(`updates/${slug}`);
 export const tagHref = (tag: string) => href(`tag/${tag}`);
 export const archiveHref = (month?: string) => href('archive', month ? `m-${month}` : undefined);
 export const rssHref = () => href('rss.xml');

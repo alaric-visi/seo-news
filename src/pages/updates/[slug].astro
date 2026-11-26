@@ -1,0 +1,130 @@
+---
+import type { GetStaticPaths } from 'astro';
+import GoogleUpdatesPanel from '../../components/GoogleUpdatesPanel.astro';
+import StoryCard from '../../components/StoryCard.astro';
+import TagChip from '../../components/TagChip.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { daysBetween, formatDayLong, formatDayShort, formatTime, londonDay } from '../../lib/dates';
+import { dayHref } from '../../lib/paths';
+import { activeTags, loadNews, rolloutWindowDays, storiesForIncident } from '../../lib/query';
+import { collectionJsonLd } from '../../lib/seo';
+import type { GoogleIncident } from '../../lib/types';
+
+export const getStaticPaths = (async () => {
+  const data = await loadNews();
+  return data.incidents.map((incident) => ({
+    params: { slug: data.incidentSlugs.get(incident.id)! },
+    props: { incident },
+  }));
+}) satisfies GetStaticPaths;
+
+const { slug } = Astro.params;
+const { incident } = Astro.props as { incident: GoogleIncident };
+const data = await loadNews();
+const stories = storiesForIncident(data, incident);
+const byDay = new Map<string, typeof stories>();
+for (const s of stories) byDay.set(s.day, [...(byDay.get(s.day) ?? []), s]);
+
+const startDay = londonDay(incident.beginAt);
+const endDay = incident.endAt ? londonDay(incident.endAt) : null;
+const isOpen = !endDay;
+const isRanking = incident.serviceName === 'Ranking';
+const durationDays = daysBetween(startDay, endDay ?? data.today) + 1;
+const windowDays = rolloutWindowDays(incident.updates);
+const fullName = /^google\b/i.test(incident.title) ? incident.title : `Google ${incident.title}`;
+const statusText = isOpen
+  ? `${isRanking ? 'Rolling out' : 'Ongoing'} since ${formatDayLong(startDay)} (day ${durationDays}${windowDays ? ` of up to ${windowDays}` : ''})`
+  : `Rolled out ${formatDayShort(startDay)}${startDay !== endDay ? ` to ${formatDayShort(endDay!)}` : ''} (${durationDays} ${durationDays === 1 ? 'day' : 'days'})`;
+
+const title = `${fullName}: Rollout Status, Timeline & SEO Coverage | Mike Higgins`;
+const description = `${fullName}: ${statusText}. Official Google Search Status Dashboard updates and ${stories.length} ${stories.length === 1 ? 'article' : 'articles'} of SEO industry coverage.`;
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  ogSlug={`updates/${slug}`}
+  ogType="article"
+  publishedTime={startDay}
+  ogAlt={`${fullName}: ${statusText}`}
+  jsonLd={collectionJsonLd({ name: fullName, description, url: new URL(Astro.url.pathname, Astro.site).toString(), stories })}
+>
+  <div class="workspace">
+    <section class="panel" aria-labelledby="update-heading">
+      <div class="panel-header">
+        <div class="panel-title-wrap">
+          <p class="panel-title">Google {incident.serviceName ?? 'Search'} update</p>
+          <span class="panel-meta">{isOpen ? (isRanking ? 'Rolling out' : 'Ongoing') : 'Completed'}</span>
+          <span class="panel-meta">{stories.length} {stories.length === 1 ? 'story' : 'stories'}</span>
+        </div>
+        <a href={incident.uri} rel="noopener" target="_blank" class="btn btn-xs">Official status page ↗</a>
+      </div>
+
+      <div class="panel-body">
+        <p class="mono mb-1 text-[12px] text-accent">
+          <time datetime={startDay}>{formatDayLong(startDay)}</time>
+          {endDay && endDay !== startDay && <> to <time datetime={endDay}>{formatDayLong(endDay)}</time></>}
+        </p>
+        <h1 id="update-heading" class="text-2xl font-semibold tracking-[-0.02em] text-white sm:text-[28px]">{fullName}</h1>
+        <p class="mt-1 text-[13.5px] text-muted-foreground">{statusText}.</p>
+
+        {isOpen && windowDays && (
+          <div class="mt-4 max-w-md">
+            <div class="h-1.5 overflow-hidden rounded-full bg-white/10" role="presentation">
+              <div class="h-full rounded-full bg-primary shadow-[0_0_8px_var(--accent-glow)]" style={`width:${Math.min(100, Math.round((durationDays / windowDays) * 100))}%`}></div>
+            </div>
+          </div>
+        )}
+
+        {incident.updates.length > 0 && (
+          <section aria-labelledby="status-timeline" class="info-card mt-5">
+            <h2 id="status-timeline" class="info-card-title mb-2.5">Official status timeline</h2>
+            <ol class="space-y-3">
+              {incident.updates.map((u) => {
+                const uDay = londonDay(u.when);
+                return (
+                  <li class="text-[13px] leading-relaxed text-[#d4d4d8]">
+                    <p class="mono text-[11px] text-accent">
+                      <a href={dayHref(uDay, data.daySlugs)} class="hover:underline">{formatDayLong(uDay)}</a> · {formatTime(u.when)} UK
+                    </p>
+                    <p class="mt-0.5">{u.text}</p>
+                  </li>
+                );
+              })}
+            </ol>
+          </section>
+        )}
+
+        <h2 class="section-label mb-3 mt-6">Announcement & industry coverage</h2>
+        {stories.length === 0 ? (
+          <p class="text-[13.5px] text-muted-foreground">No articles matched this incident in the archive yet.</p>
+        ) : (
+          <div class="space-y-7">
+            {[...byDay.entries()].map(([day, list]) => (
+              <section aria-labelledby={`d-${day}`}>
+                <h3 id={`d-${day}`} class="section-label mb-2.5">
+                  <a href={dayHref(day, data.daySlugs)} class="hover:text-foreground">{formatDayLong(day)}</a>
+                </h3>
+                <ul class="space-y-3">
+                  {list.map((s) => <li class="list-none"><StoryCard story={s} /></li>)}
+                </ul>
+              </section>
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
+
+    <aside class="panel" aria-label="All Google updates and topics">
+      <GoogleUpdatesPanel data={data} currentId={incident.id} />
+      <section class="side-section" aria-labelledby="topics-heading">
+        <div class="panel-header">
+          <h2 id="topics-heading" class="panel-title">Topics</h2>
+        </div>
+        <div class="flex flex-wrap gap-1.5 p-4">
+          {activeTags(data).map((t) => <TagChip tag={t.id} count={data.tagCounts.get(t.id)} />)}
+        </div>
+      </section>
+    </aside>
+  </div>
+</BaseLayout>

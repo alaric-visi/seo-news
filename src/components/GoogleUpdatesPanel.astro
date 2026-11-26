@@ -1,20 +1,13 @@
 ---
 import { daysBetween, formatDayShort, londonDay } from '../lib/dates';
-import type { NewsData } from '../lib/query';
+import { updateHref } from '../lib/paths';
+import { rolloutWindowDays, type NewsData } from '../lib/query';
 
-interface Props { data: NewsData }
-const { data } = Astro.props;
-
-/** Ranking updates usually say "may take up to 2 weeks"; read the figure if present. */
-function rolloutWindowDays(updates: { text: string }[]): number | null {
-  for (const u of updates) {
-    const m = /up to (\d+|one|two|three|four) (day|week)s?/i.exec(u.text);
-    if (!m) continue;
-    const n = { one: 1, two: 2, three: 3, four: 4 }[m[1].toLowerCase()] ?? Number(m[1]);
-    return m[2].toLowerCase() === 'week' ? n * 7 : n;
-  }
-  return null;
+interface Props {
+  data: NewsData;
+  currentId?: string;
 }
+const { data, currentId } = Astro.props;
 
 const open = data.incidents.filter((i) => !i.endAt);
 const recent = data.incidents.filter((i) => i.endAt).slice(0, 6);
@@ -37,8 +30,13 @@ const recent = data.incidents.filter((i) => i.endAt).slice(0, 6);
         const day = daysBetween(londonDay(i.beginAt), data.today) + 1;
         const window = rolloutWindowDays(i.updates);
         const isRanking = i.serviceName === 'Ranking';
+        const slug = data.incidentSlugs.get(i.id)!;
         return (
-          <a href={i.uri} rel="noopener" target="_blank" class="info-card block transition-colors hover:border-[var(--accent-hex)]">
+          <a
+            href={updateHref(slug)}
+            aria-current={i.id === currentId ? 'page' : undefined}
+            class:list={['info-card block transition-colors hover:border-[var(--accent-hex)]', i.id === currentId && 'border-[var(--accent-hex)]']}
+          >
             <span class="status-badge info-card-title">
               <span class="status-badge-dot animate-pulse motion-reduce:animate-none" aria-hidden="true"></span>
               {isRanking ? 'Rolling out' : 'Ongoing'}
@@ -64,10 +62,11 @@ const recent = data.incidents.filter((i) => i.endAt).slice(0, 6);
               const start = londonDay(i.beginAt);
               const end = londonDay(i.endAt!);
               const length = daysBetween(start, end) + 1;
+              const slug = data.incidentSlugs.get(i.id)!;
               return (
                 <li>
-                  <a href={i.uri} rel="noopener" target="_blank" class="group block">
-                    <span class="text-[13px] text-foreground/90 group-hover:text-foreground">{i.title}</span>
+                  <a href={updateHref(slug)} aria-current={i.id === currentId ? 'page' : undefined} class="group block">
+                    <span class:list={['text-[13px] group-hover:text-foreground', i.id === currentId ? 'font-medium text-accent' : 'text-foreground/90']}>{i.title}</span>
                     <span class="mono block text-[11px] text-[var(--text-dim)]">
                       {i.serviceName && i.serviceName !== 'Ranking' && `${i.serviceName} · `}{formatDayShort(start)}{start !== end && ` – ${formatDayShort(end)}`} · {length} {length === 1 ? 'day' : 'days'}
                     </span>

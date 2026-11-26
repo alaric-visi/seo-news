@@ -1,11 +1,11 @@
 import type { APIRoute, GetStaticPaths } from 'astro';
 import { SOURCES } from '../../config/sources';
 import { tagById } from '../../config/tags';
-import { formatDayLong } from '../../lib/dates';
+import { daysBetween, formatDayLong, formatDayShort, londonDay } from '../../lib/dates';
 import { renderOgImage, type OgContent } from '../../lib/og';
-import { activeTags, groupsForDay, loadNews, openIncidents, type NewsData } from '../../lib/query';
+import { activeTags, groupsForDay, loadNews, openIncidents, storiesForIncident, type NewsData } from '../../lib/query';
 
-/** One Open Graph image per page: /og/home.png, /og/archive.png, /og/2026-11-10.png, /og/tag/core-update.png */
+/** One Open Graph image per page: /og/home.png, /og/archive.png, /og/2026-11-10.png, /og/tag/core-update.png, /og/updates/november-2026-core-update.png */
 export const getStaticPaths = (async () => {
   const data = await loadNews();
   return [
@@ -13,6 +13,7 @@ export const getStaticPaths = (async () => {
     { params: { slug: 'archive' } },
     ...data.days.map((d) => ({ params: { slug: d } })),
     ...activeTags(data).map((t) => ({ params: { slug: `tag/${t.id}` } })),
+    ...[...data.incidentBySlug.keys()].map((s) => ({ params: { slug: `updates/${s}` } })),
   ];
 }) satisfies GetStaticPaths;
 
@@ -45,6 +46,24 @@ function contentFor(slug: string, data: NewsData): OgContent {
       title: `${rule.label} news`,
       subtitle: rule.intro,
       pills: [plural(data.tagCounts.get(rule.id) ?? 0, 'story', 'stories')],
+    };
+  }
+  if (slug.startsWith('updates/')) {
+    const incident = data.incidentBySlug.get(slug.slice(8))!;
+    const stories = storiesForIncident(data, incident);
+    const start = londonDay(incident.beginAt);
+    const end = incident.endAt ? londonDay(incident.endAt) : null;
+    const isOpen = !end;
+    const days = daysBetween(start, end ?? data.today) + 1;
+    const fullName = /^google\b/i.test(incident.title) ? incident.title : `Google ${incident.title}`;
+    return {
+      kicker: `Google ${incident.serviceName ?? 'Search'} update`,
+      title: fullName,
+      subtitle: isOpen
+        ? `Rolling out since ${formatDayLong(start)} · official status timeline and industry coverage.`
+        : `Rolled out ${formatDayShort(start)} to ${formatDayShort(end!)} (${plural(days, 'day')}) · official timeline and coverage.`,
+      pills: [isOpen ? `Rolling out · day ${days}` : `Completed · ${plural(days, 'day')}`, plural(stories.length, 'story', 'stories')],
+      highlightFirstPill: isOpen,
     };
   }
 

@@ -4,8 +4,11 @@ import { dayHref } from '../lib/paths';
 import type { StoryGroup } from '../lib/query';
 import StoryCard from './StoryCard.astro';
 
-interface Props { group: StoryGroup }
-const { group } = Astro.props;
+interface Props {
+  group: StoryGroup;
+  daySlugs?: ReadonlyMap<string, string>;
+}
+const { group, daySlugs } = Astro.props;
 const { lead, others, elsewhere } = group;
 ---
 
@@ -32,7 +35,7 @@ const { lead, others, elsewhere } = group;
           {elsewhere.slice(0, 4).map((s, i) => (
             <>
               {i > 0 && ', '}
-              <a href={dayHref(s.day)} class="text-accent hover:underline">{formatDayShort(s.day)} ({s.sourceName})</a>
+              <a href={dayHref(s.day, daySlugs)} class="text-accent hover:underline">{formatDayShort(s.day)} ({s.sourceName})</a>
             </>
           ))}
           {elsewhere.length > 4 && ` and ${elsewhere.length - 4} more`}

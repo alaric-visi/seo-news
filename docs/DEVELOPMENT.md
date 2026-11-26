@@ -27,7 +27,8 @@ On https://seo-news.mikehiggins.me.uk:
 | Path | |
 |---|---|
 | `/` | Latest full day, "so far today", Google updates panel, calendar |
-| `/2026-11-12/` | One day: AI intro, stories grouped by event, previous/next day |
+| `/2026-11-10-google-november-2026-core-update/` | One day (`/2026-11-10/` 301 redirects here): AI intro, stories grouped by event, previous/next day |
+| `/updates/november-2026-core-update/` | One page per Google Search Status Dashboard incident, with rollout timeline and matched coverage |
 | `/archive/` | Month calendars |
 | `/tag/core-update/` | One page per tag that has stories |
 | `/rss.xml` | Our feed (latest 50 stories, linking to the originals) |
